@@ -29,6 +29,9 @@ usersRouter.post('/login', function(req, res) {
 					con.release();
 				throw err;
 			}
+
+			// TO-DO: rewrite query request so it can accept more than one variable
+			// without crashing
 			const result = await con.query({
 				sql: "SELECT * FROM users WHERE (Username = ?)",
 				values: [username]
