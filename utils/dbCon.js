@@ -9,7 +9,7 @@ const user = process.env.DB_USER;
 const password = process.env.DB_PASS;
 const database = process.env.DB_NAME;
 
-var dbCon = mysql.createPool({
+var pool = mysql.createPool({
 	connectionLimit: 100,
 	host,
 	port,
@@ -19,4 +19,4 @@ var dbCon = mysql.createPool({
 	debug: isDebug
 });
 
-module.exports = dbCon;
+module.exports = pool;

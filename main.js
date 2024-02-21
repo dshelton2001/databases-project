@@ -1,6 +1,10 @@
 const express = require('express');
-const PORT = process.env.PORT || 5000;
 const app = express();
+
+// needed to use .env
+require('dotenv').config()
+
+const PORT = process.env.PORT || 5000;
 
 if (process.env.NODE_ENV === 'production')
 {
@@ -27,6 +31,16 @@ app.use((req, res, next) =>
 	next();
 });
 
+// middleware
+app.use(express.json());
+
+// api endpoints
+const usersRouter = require("./api/users");
+
+// activate routers
+app.use("/api/users", usersRouter);
+
+// yippee!
 app.listen(PORT, () => {
 	console.log("Server listening on port " + PORT);
 });
