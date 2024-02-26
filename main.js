@@ -1,4 +1,5 @@
 const express = require('express');
+const bodyParser = require('body-parser');
 const app = express();
 
 // needed to use .env
@@ -33,6 +34,7 @@ app.use((req, res, next) =>
 
 // middleware
 app.use(express.json());
+app.use(bodyParser.json());
 
 // api endpoints
 const usersRouter = require("./api/users");
