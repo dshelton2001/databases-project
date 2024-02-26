@@ -46,7 +46,7 @@ usersRouter.post('/login', function(req, res) {
 				}
 				else
 				{
-					retCode = 404;
+					retCode = 400;
 					message = "Incorrect username/password combination"
 					var ret = {message};
 				}
@@ -63,5 +63,83 @@ usersRouter.post('/login', function(req, res) {
 		res.status(retCode).json(ret);
 	}
 });
+
+usersRouter.post('/register', function(req, res) {
+	// start every API endpoint with the default return codes
+	let retCode = 200;
+	let message = "";
+
+	// this'll have more in it once we solidify what customization our users have
+	// like fn, ln, etc.
+	const {username, password} = req.body;
+
+	if (!username || !password)
+	{
+		message = "invalid input";
+		retCode = 400;
+		var ret = {message};
+
+		res.status(retCode).json(ret);
+	}
+
+	console.log("Begin REGISTER for User " + username);
+
+	try
+	{	
+		// start by contacting the pool
+		pool.getConnection(function(err, con) {
+			if (err)
+			{
+				if (con)
+					con.release();
+				throw err;
+			}
+
+			con.query({
+				sql: "INSERT IGNORE INTO users SET ?",
+				values: {Username: username, Password: password}
+			}, function (err, results) {
+				if (err)
+				{
+					if (con)
+						con.release();
+					throw err;
+				}
+
+				// error checking
+				if (results && results.affectedRows > 0)
+				{
+					retCode = 201;
+				}
+				else
+				{
+					if (results && results.affectedRows == 0)
+					{
+						retCode = 400;
+						message = "Duplicate user or invalid input";
+					}
+					else
+					{
+						retCode = 409;
+						message = "User creation failed when sent to server";
+					}
+				}
+
+				var ret = {message};
+				res.status(retCode).json(ret);
+			});
+
+			
+		});
+	}
+	catch (e)
+	{
+		retCode = 404;
+		var ret = {error: e.message};
+
+		res.status(retCode).json(ret);
+	}
+});
+
 
 module.exports = usersRouter;
