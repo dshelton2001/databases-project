@@ -73,6 +73,7 @@ usersRouter.post('/register', function(req, res) {
 	// like fn, ln, etc.
 	const {username, password} = req.body;
 
+	// To-do: maybe make this better
 	if (!username || !password)
 	{
 		message = "invalid input";
@@ -97,6 +98,8 @@ usersRouter.post('/register', function(req, res) {
 				throw err;
 			}
 
+			// ignore is added since we want to do error checking ourselves
+			// for duplicate entries
 			con.query({
 				sql: "INSERT IGNORE INTO users SET ?",
 				values: {Username: username, Password: password}
@@ -115,6 +118,8 @@ usersRouter.post('/register', function(req, res) {
 				}
 				else
 				{
+					// annoying, but we need to make sure we can give a good
+					// explanation to devs when error checking :)
 					if (results && results.affectedRows == 0)
 					{
 						retCode = 400;
@@ -142,6 +147,5 @@ usersRouter.post('/register', function(req, res) {
 		res.status(retCode).json(ret);
 	}
 });
-
 
 module.exports = usersRouter;
