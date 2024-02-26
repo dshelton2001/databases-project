@@ -80,6 +80,8 @@ usersRouter.post('/register', function(req, res) {
 		var ret = {message};
 
 		res.status(retCode).json(ret);
+
+		return;
 	}
 
 	console.log("Begin REGISTER for User " + username);
