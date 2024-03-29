@@ -18,5 +18,4 @@ var pool = mysql.createPool({
 	database,
 	debug: isDebug
 });
-
 module.exports = pool;

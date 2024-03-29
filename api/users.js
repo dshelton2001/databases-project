@@ -29,7 +29,7 @@ usersRouter.post('/login', function(req, res) {
 			}
 
 			// unfortunately, as nodejs runs async, we must perform our return functions
-			// within this query
+			// within this query 
 			con.query({
 				sql: "SELECT users.uid FROM users WHERE Username = ? AND Password = ?",
 				values: [username, password]

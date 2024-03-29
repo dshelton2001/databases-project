@@ -53,8 +53,10 @@ CREATE TABLE `database-project`.Comments
 CREATE TABLE `database-project`.RSOs
 (
 	RSOID INT NOT NULL,
-	Name VARCHAR(30),
+	UID INT NOT NULL,
+	Name VARCHAR(30) NOT NULL,
 	Description VARCHAR(300),
+	FOREIGN KEY (UID) REFERENCES Admins(UID),
 	PRIMARY KEY (RSOID)
 );
 

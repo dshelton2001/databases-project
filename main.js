@@ -38,9 +38,11 @@ app.use(bodyParser.json());
 
 // api endpoints
 const usersRouter = require("./api/users");
+const RsoRouter = require("./api/RSO");
 
 // activate routers
 app.use("/api/users", usersRouter);
+app.use("/api/rso", RsoRouter);
 
 // yippee!
 app.listen(PORT, () => {
