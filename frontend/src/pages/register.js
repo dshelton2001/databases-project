@@ -1,17 +1,17 @@
 import React from 'react';
 
 import DefaultHeader from '../sections/default_header';
-import IndexBody from '../sections/index_body';
+import RegisterBody from '../sections/register_body';
 import DefaultFooter from '../sections/default_footer';
 
-const Index = () => {
+const Register = () => {
     return (
         <div>
             <DefaultHeader />
-            <IndexBody />
+            <RegisterBody />
             <DefaultFooter />
         </div>
     )
 }
 
-export default Index;
+export default Register;
