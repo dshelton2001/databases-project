@@ -5,10 +5,12 @@ const LoginBody = () => {
     var username;
     var password;
 
-    const [message,setMessage] = React.useState('');
+    const [message, setMessage] = React.useState('');
 
-    const tryLogin = () =>
+    const tryLogin = event =>
     {
+        event.preventDefault();
+
         var object = {username:username.value, password:password.value};
         var input = JSON.stringify(object);
 
@@ -20,13 +22,13 @@ const LoginBody = () => {
                 headers: {'Content-Type': 'application/json'}
             });
 
-            if (response.message != undefined)
+            if (response.message !== undefined)
             {
                 var retMessage = JSON.parse(response.message);
                 setMessage(retMessage);
             }
 
-            if (response.result == undefined)
+            if (response.result === undefined)
             {
                 return false;
             }
@@ -45,12 +47,13 @@ const LoginBody = () => {
 
     return (
         <div>
-            <p>hewwo wogin now uwu</p>
+            <p>hello login now</p>
             <form onSubmit={tryLogin}>
-                <div>Username <input id="user" ref={(c) => username = c}/></div>
-                <div> Password <input id="pass" ref={(c) => password = c}/></div>
+                <div><label>Username</label> <input id="user" ref={(c) => username = c}/></div>
+                <div><label>Password</label> <input id="pass" ref={(c) => password = c}/></div>
                 <button>Login</button>
                 <span type="button" id="result">{message}</span>
+                <span id="loginResult">{message}</span>
             </form>
             <button>Register</button>
         </div>

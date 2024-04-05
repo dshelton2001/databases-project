@@ -3,7 +3,7 @@ import React from 'react';
 const IndexBody = () => {
 
     return (
-        <div>hewwo welcome to me website</div>
+        <div>hello welcome to me website</div>
     )
 
 }
