@@ -1,8 +1,8 @@
 import React from 'react';
 
-import DefaultHeader from '../sections/default_header';
-import LoginBody from '../sections/login_body';
-import DefaultFooter from '../sections/default_footer';
+import DefaultHeader from '../sections/header_default';
+import LoginBody from '../sections/body_login';
+import DefaultFooter from '../sections/footer_default';
 
 const Login = () => {
     return (

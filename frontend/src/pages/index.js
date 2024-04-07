@@ -1,8 +1,8 @@
 import React from 'react';
 
-import DefaultHeader from '../sections/default_header';
-import IndexBody from '../sections/index_body';
-import DefaultFooter from '../sections/default_footer';
+import DefaultHeader from '../sections/header_default';
+import IndexBody from '../sections/body_index';
+import DefaultFooter from '../sections/footer_default';
 
 const Index = () => {
     return (

@@ -1,8 +1,8 @@
 import React from 'react';
 
-import DefaultHeader from '../sections/default_header';
-import RegisterBody from '../sections/register_body';
-import DefaultFooter from '../sections/default_footer';
+import DefaultHeader from '../sections/header_default';
+import RegisterBody from '../sections/body_register';
+import DefaultFooter from '../sections/footer_default';
 
 const Register = () => {
     return (
