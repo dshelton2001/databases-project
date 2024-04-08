@@ -135,6 +135,85 @@ usersRouter.post('/register', function(req, res) {
 				var ret = {message};
 				res.status(retCode).json(ret);
 			});
+		});
+	}
+	catch (e)
+	{
+		retCode = 404;
+		var ret = {error: e.message};
+
+		res.status(retCode).json(ret);
+	}
+});
+
+usersRouter.post('/makeadmin', function(req, res) {
+	// start every API endpoint with the default return codes
+	let retCode = 200;
+	let message = "";
+
+	const {uid} = req.body;
+
+	if (!uid)
+	{
+		message = "invalid input";
+		retCode = 400;
+		var ret = {message};
+
+		res.status(retCode).json(ret);
+
+		return;
+	}
+
+	console.log("Begin MAKEADMIN for UID " + uid);
+
+	try
+	{	
+		// start by contacting the pool
+		pool.getConnection(function(err, con) {
+			if (err)
+			{
+				if (con)
+					con.release();
+				throw err;
+			}
+
+			// ignore is added since we want to do error checking ourselves
+			// for duplicate entries
+			con.query({
+				sql: "INSERT IGNORE INTO admins SET ?",
+				values: {UID: uid}
+			}, function (err, results) {
+				if (err)
+				{
+					if (con)
+						con.release();
+					throw err;
+				}
+
+				// error checking
+				if (results && results.affectedRows > 0)
+				{
+					retCode = 201;
+				}
+				else
+				{
+					// annoying, but we need to make sure we can give a good
+					// explanation to devs when error checking :)
+					if (results && results.affectedRows == 0)
+					{
+						retCode = 400;
+						message = "Duplicate user or invalid input";
+					}
+					else
+					{
+						retCode = 409;
+						message = "User creation failed when sent to server";
+					}
+				}
+
+				var ret = {message};
+				res.status(retCode).json(ret);
+			});
 
 			
 		});

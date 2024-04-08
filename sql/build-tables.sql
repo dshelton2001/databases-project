@@ -1,8 +1,10 @@
 CREATE TABLE `database-project`.Users
 (
-	UID INT NOT NULL,
+	UID INT NOT NULL AUTO_INCREMENT,
 	Username VARCHAR(20) UNIQUE NOT NULL,
 	Password VARCHAR(20) NOT NULL,
+	FirstName VARCHAR(20),
+	LastName VARCHAR(20),
 	PRIMARY KEY (UID)
 );
 
@@ -29,7 +31,7 @@ CREATE TABLE `database-project`.Location
 
 CREATE TABLE `database-project`.Events
 (
-	EventID INT NOT NULL,
+	EventID INT NOT NULL AUTO_INCREMENT,
 	Name VARCHAR(30),
 	LocationName VARCHAR(30),
 	Time TIME,
@@ -40,7 +42,7 @@ CREATE TABLE `database-project`.Events
 
 CREATE TABLE `database-project`.Comments
 (
-	CommentID INT NOT NULL,
+	CommentID INT NOT NULL AUTO_INCREMENT,
 	EventID INT NOT NULL,
 	UID INT NOT NULL,
 	Time TIME,
@@ -52,32 +54,44 @@ CREATE TABLE `database-project`.Comments
 
 CREATE TABLE `database-project`.RSOs
 (
-	RSOID INT NOT NULL,
-	UID INT NOT NULL,
+	RSOID INT NOT NULL AUTO_INCREMENT,
 	Name VARCHAR(30) NOT NULL,
 	Description VARCHAR(300),
-	FOREIGN KEY (UID) REFERENCES Admins(UID),
 	PRIMARY KEY (RSOID)
 );
 
 CREATE TABLE `database-project`.RSOEvents
 (
 	EventID INT NOT NULL,
-	FOREIGN KEY (EventID) REFERENCES Events(EventID)
+	RSOID INT NOT NULL,
+	FOREIGN KEY (EventID) REFERENCES Events(EventID),
+	FOREIGN KEY (RSOID) REFERENCES RSOs(RSOID)
 );
 
 CREATE TABLE `database-project`.PrivateEvents
 (
 	EventID INT NOT NULL,
-	AdminID INT,
-	SuperAdminID INT,
-	FOREIGN KEY (EventID) REFERENCES Events(EventID),
-	FOREIGN KEY (AdminID) REFERENCES Admins(UID),
-	FOREIGN KEY (SuperAdminID) REFERENCES SuperAdmins(UID)
+	FOREIGN KEY (EventID) REFERENCES Events(EventID)
 );
 
 CREATE TABLE `database-project`.PublicEvents
 (
 	EventID INT NOT NULL,
 	FOREIGN KEY (EventID) REFERENCES Events(EventID)
+);
+
+CREATE TABLE `database-project`.RSOCreationHistory
+(
+	RSOID INT NOT NULL,
+	UID INT NOT NULL,
+	FOREIGN KEY (RSOID) REFERENCES Events(RSO),
+	FOREIGN KEY (UID) REFERENCES Admins(UID)
+);
+
+CREATE TABLE `database-project`.EventCreationHistory
+(
+	EventID INT NOT NULL,
+	UID INT NOT NULL,
+	FOREIGN KEY (EventID) REFERENCES Events(EventID),
+	FOREIGN KEY (UID) REFERENCES Admins(UID)
 );

@@ -2,12 +2,13 @@ var express = require('express');
 const RsoRouter = require('express').Router();
 var pool = require('../utils/dbCon');
 
-RsoRouter.post('/create', function(req,res){
+RsoRouter.post('/create', function(req,res)
+{
     let retCode = 200;
 	let message = "";
     const {name, description, uid} =req.body;  
     
-
+    console.log("Begin CREATE for RSO " + name);
 
     try
 	{	
@@ -19,31 +20,77 @@ RsoRouter.post('/create', function(req,res){
 					con.release();
 				throw err;
 			}    
-    con.query({
-            sql: "SELECT * FROM admins WHERE uid = ?",
-            values: [uid]
-        }, function (err,results) {
-            if(err)
-                throw err;
-
-            con.release();
-
-            if (results[0])
+        con.query(
             {
-                var ret = {result: results[0], message};
-            }
-            else
+                sql: "SELECT * FROM admins WHERE uid = ?",
+                values: [uid]
+            }, function (err,results) 
             {
-                retCode = 400;
-                message = "Incorrect username/password combination"
-                var ret = {message};
-            }
-            res.status(retCode).json(ret);
+                if(err)
+                    throw err;
 
+                if (!results[0])
+                {
+                    retCode = 400;
+                    message = "user not found as admin."
+                    var ret = {message};
+                }
+                else
+                {
+                    con.query({
+                        sql: "INSERT IGNORE INTO RSOs SET ?",
+                        values: {Name: name, Description: description}
+                    }, function (err, results)
+                    {
+                        if(err)
+                        {
+                            if(con)
+                                con.release();
+                            throw err;
+                        }
+
+                        if(results && results.affectedRows > 0)
+                        {
+                            const rsoid = results.insertId;
+
+                            con.query({sql: "INSERT INTO RSOCreationHistory SET ?",
+                            values: {UID: uid, RSOID: rsoid}}, function (err, resultsHistory) {
+                                if(err)
+                                {
+                                    if (con)
+                                        con.release();
+                                    throw err;
+                                }
+
+                                if(resultsHistory && resultsHistory.affectedRows > 0)
+                                {
+                                    retCode = 200;
+                                }
+                                else
+                                {
+                                    retCode = 409;
+                                    message = "failed in rso creation";
+                                    var ret = {message};
+                                }
+
+                                res.status(retCode).json(ret);
+                            });
+                            retCode = 201;
+                        }
+                        else
+                        {
+                            retCode = 409;
+                            message = "failed. :("
+                            var ret = {message};
+
+                            res.status(retCode).json(ret);
+                        }
+                    })
+                }
             });
         });
     }
-catch(e)
+    catch(e)
     {
 		retCode = 404;
 		var ret = {error: e.message};
@@ -51,4 +98,8 @@ catch(e)
 		res.status(retCode).json(ret);
 	}
 });
+
+
+
+
 module.exports = RsoRouter;
