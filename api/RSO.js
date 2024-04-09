@@ -99,6 +99,55 @@ RsoRouter.post('/create', function(req,res)
 	}
 });
 
+RsoRouter.post('/search', function(req,res)
+{
+    let retCode = 200;
+    let message = "base message.";
+
+    const {name} = req.body;
+
+    try
+	{	
+		// start by contacting the pool
+		pool.getConnection(function(err, con) 
+        {
+			if (err)
+			{
+				if (con)
+					con.release();
+				throw err;
+			}
+            
+            con.query({sql: "SELECT * FROM rsos WHERE Name LIKE ?",
+            values: ["%" + name + "%"]}, function (err, results) {
+            if(err)
+                throw err;
+            con.release();
+
+            if(results[0])
+            {
+                message = "hooray";
+                var ret = {result: results, message};
+            }
+            else
+            {
+                retCode = 400;
+                message = "Not found."
+                var ret = {message};
+            }
+            res.status(retCode).json(ret);
+
+        })
+        });
+
+    }
+    catch(e)
+    {
+		retCode = 404;
+		var ret = {error: e.message};
+		res.status(retCode).json(ret);
+    }
+});
 
 
 

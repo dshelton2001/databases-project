@@ -9,6 +9,21 @@ const DefaultHeader = () => {
 		window.location.href = "/"
 	}
 
+	const checkForCookie = () => {
+		const cookie = false;
+
+		return cookie;
+	}
+
+	React.useEffect(() => {
+		return () => {
+			if (!checkForCookie())
+			{
+				redirectLogout();
+			}
+		};
+	},[]);
+
 	return (
 		<header>
 			<div>
