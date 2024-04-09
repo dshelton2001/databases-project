@@ -1,4 +1,5 @@
 import React from 'react';
+import Cookies from 'universal-cookie';
 const route = require('./route.js');
 
 const LoginBody = () => {
@@ -9,6 +10,23 @@ const LoginBody = () => {
 
     const redirectRegister = () => {
 		window.location.href = "/register"
+	}
+
+    const redirectHome = () => {
+		window.location.href = "/home"
+	}
+
+    const checkForCookie = () => {
+		const cookies = new Cookies();
+
+		var cookie = cookies.get('login');
+
+		if (cookie)
+		{
+			return true;
+		}
+
+		return false;
 	}
 
     const tryLogin = async event =>
@@ -25,16 +43,27 @@ const LoginBody = () => {
                 body: input,
                 headers: {'Content-Type': 'application/json'}
             });
-
+            console.log("parseee");
             var ret = JSON.parse(await response.text());
             setMessage(ret.message);
 
-            if (ret.result === undefined)
+            if (ret.uid === undefined)
             {
+                
                 return false;
             }
             else
             {
+                setMessage(ret.uid);
+                console.log("loggggg");
+                const cookies = new Cookies();
+                cookies.set('login', ret.uid, 
+                {
+                    path: "/",
+                    httpOnly: false,
+                    sameSite: 'strict',
+                    maxAge: 86400
+                });
                 window.location.href = '/home';
             }
         }
@@ -45,6 +74,15 @@ const LoginBody = () => {
             return;
         }
     }
+
+    React.useEffect(() => {
+		return () => {
+			if (checkForCookie())
+			{
+				redirectHome();
+			}
+		};
+	},[]);
 
     return (
         <div>

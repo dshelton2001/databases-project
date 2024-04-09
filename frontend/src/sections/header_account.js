@@ -1,4 +1,5 @@
 import React from 'react';
+import Cookies from 'universal-cookie';
 
 const DefaultHeader = () => {
 	const redirectHome = () => {
@@ -6,13 +7,23 @@ const DefaultHeader = () => {
 	}
 
 	const redirectLogout = () => {
+		const cookies = new Cookies();
+		cookies.remove('login');
+
 		window.location.href = "/"
 	}
 
 	const checkForCookie = () => {
-		const cookie = false;
+		const cookies = new Cookies();
 
-		return cookie;
+		var cookie = cookies.get('login');
+
+		if (cookie)
+		{
+			return true;
+		}
+
+		return false;
 	}
 
 	React.useEffect(() => {

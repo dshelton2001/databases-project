@@ -1,4 +1,5 @@
 import React from 'react';
+import Cookies from 'universal-cookie';
 const route = require('./route.js');
 
 const RegisterBody = () => {
@@ -29,13 +30,22 @@ const RegisterBody = () => {
             var ret = JSON.parse(await response.text());
             setMessage(ret.message);
 
-            if (ret.result === undefined)
+            if (ret.uid === undefined)
             {
                 return false;
             }
             else
             {
-                window.location.href = '/home';
+                setMessage(ret.uid);
+                const cookies = new Cookies();
+                cookies.set('login', ret.uid, 
+                {
+                    path: "/",
+                    httpOnly: false,
+                    sameSite: 'strict',
+                    maxAge: 86400
+                });
+                window.location.href = '/login';
             }
         }
         catch(e)

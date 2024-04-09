@@ -1,6 +1,5 @@
 var express = require('express');
 const usersRouter = require('express').Router();
-
 var pool = require('../utils/dbCon');
 
 usersRouter.post('/login', function(req, res) {
@@ -42,7 +41,7 @@ usersRouter.post('/login', function(req, res) {
 				// check if login was successful
 				if (results[0])
 				{
-					var ret = {result: results[0], message};
+					var ret = {uid: results[0].uid, message};
 				}
 				else
 				{
@@ -112,9 +111,12 @@ usersRouter.post('/register', function(req, res) {
 				}
 
 				// error checking
+				var ret;
+
 				if (results && results.affectedRows > 0)
 				{
 					retCode = 201;
+					ret = {uid:results.insertId, message};
 				}
 				else
 				{
@@ -130,9 +132,11 @@ usersRouter.post('/register', function(req, res) {
 						retCode = 409;
 						message = "User creation failed when sent to server";
 					}
+
+					ret = {message};
 				}
 
-				var ret = {message};
+				
 				res.status(retCode).json(ret);
 			});
 		});
