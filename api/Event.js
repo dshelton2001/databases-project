@@ -73,7 +73,53 @@ RsoRouter.post('/create', function(req,res)
 		res.status(retCode).json(ret);
 	}
 });
+RsoRouter.post('/comment', function(req,res)
+{
+    let retCode = 200;
+    let message = "";
+    const{eventID,uid,time,comment} = req.body;
 
+    try
+    {
+        pool.getConnection(function(err, con) {
+            if (err)
+            {
+                if (con)
+                    con.release();
+                throw err;
+            }
+        con.query({sql: "INSERT IGNORE INTO Comments SET ?", values: {EventID: eventID,UID: uid,Time: time,Comment: comment}},
+            function (err,results) {
+                if (err)
+                {
+                    if (con)
+                        con.release();
+                    throw err;
+                }
+
+                if(results && results.affectedRows > 0)
+                {
+                    retCode = 200;
+                }
+                else
+                {
+                    retCode = 409;
+                    message = "comment failed to be made.";
+                    var ret = {message};
+                }
+
+                res.status(retCode).json(ret);
+            });
+        });
+    }
+    catch(e)
+    {
+		retCode = 404;
+		var ret = {error: e.message};
+
+		res.status(retCode).json(ret);
+	}
+});
 
 
 
