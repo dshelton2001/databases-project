@@ -104,7 +104,7 @@ RsoRouter.post('/search', function(req,res)
     let retCode = 200;
     let message = "base message.";
 
-    const {name} = req.body;
+    const {name, getAll} = req.body;
 
     try
 	{	
@@ -118,26 +118,26 @@ RsoRouter.post('/search', function(req,res)
 				throw err;
 			}
             
-            con.query({sql: "SELECT * FROM rsos WHERE Name LIKE ?",
-            values: ["%" + name + "%"]}, function (err, results) {
-            if(err)
-                throw err;
-            con.release();
+            con.query({
+                sql: "SELECT * FROM rsos WHERE Name LIKE ?",
+                values: ["%" + name + "%"]},
+            function (err, results) {
+                if(err)
+                    throw err;
+                con.release();
+                
+                if(results[0])
+                {
 
-            if(results[0])
-            {
-                message = "hooray";
-                var ret = {result: results, message};
-            }
-            else
-            {
-                retCode = 400;
-                message = "Not found."
-                var ret = {message};
-            }
-            res.status(retCode).json(ret);
-
-        })
+                }
+                else
+                {
+                    retCode = 400;
+                    message = "Not found."
+                    var ret = {message};
+                }
+                res.status(retCode).json(ret);
+            })
         });
 
     }
@@ -149,6 +149,54 @@ RsoRouter.post('/search', function(req,res)
     }
 });
 
+RsoRouter.post('/join', function(req,res)
+{
+    let retCode = 200;
+    let message = "base message.";
 
+    const {uid, rsoid} = req.body;
+
+    try
+	{	
+		// start by contacting the pool
+		pool.getConnection(function(err, con) 
+        {
+			if (err)
+			{
+				if (con)
+					con.release();
+				throw err;
+			}
+            
+            con.query({
+                sql: "INSERT INTO rsomembers SET ?",
+                values: {UID: uid, RSOID: rsoid}
+            }, function (err, results) {
+                if(err)
+                    throw err;
+                con.release();
+
+                if(results && results.affectedRows > 0)
+                {
+                    message = "Successfully joined.";
+                    var ret = {result: results[0], message};
+                }
+                else
+                {
+                    retCode = 400;
+                    message = "Error with User or RSO information. Refresh and try again."
+                    var ret = {message};
+                }
+                res.status(retCode).json(ret);
+            })
+        });
+    }
+    catch(e)
+    {
+		retCode = 404;
+		var ret = {error: e.message};
+		res.status(retCode).json(ret);
+    }
+});
 
 module.exports = RsoRouter;

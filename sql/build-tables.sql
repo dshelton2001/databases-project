@@ -88,6 +88,14 @@ CREATE TABLE `database-project`.RSOCreationHistory
 	FOREIGN KEY (UID) REFERENCES Admins(UID)
 );
 
+CREATE TABLE `database-project`.RSOMembers
+(
+	RSOID INT NOT NULL,
+	UID INT NOT NULL,
+	FOREIGN KEY (RSOID) REFERENCES Events(RSO),
+	FOREIGN KEY (UID) REFERENCES Users(UID)
+);
+
 CREATE TABLE `database-project`.EventCreationHistory
 (
 	EventID INT NOT NULL,
@@ -95,3 +103,4 @@ CREATE TABLE `database-project`.EventCreationHistory
 	FOREIGN KEY (EventID) REFERENCES Events(EventID),
 	FOREIGN KEY (UID) REFERENCES Admins(UID)
 );
+
