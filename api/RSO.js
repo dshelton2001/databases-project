@@ -199,4 +199,46 @@ RsoRouter.post('/join', function(req,res)
     }
 });
 
+
+RsoRouter.post('/unjoin', function(req, res) {
+    let retCode = 200;
+    let message = "base message.";
+
+    const { uid, rsoid } = req.body;
+
+    try {
+        // start by contacting the pool
+        pool.getConnection(function(err, con) {
+            if (err) {
+                if (con)
+                    con.release();
+                throw err;
+            }
+
+            con.query({
+                sql: "DELETE FROM rsomembers WHERE UID = ? AND RSOID = ?",
+                values: [uid, rsoid]
+            }, function(err, results) {
+                if (err)
+                    throw err;
+                con.release();
+
+                if (results && results.affectedRows > 0) {
+                    message = "Unjoined.";
+                    var ret = { result: results[0], message };
+                } else {
+                    retCode = 400;
+                    message = "No work."
+                    var ret = { message };
+                }
+                res.status(retCode).json(ret);
+            })
+        });
+    } catch (e) {
+        retCode = 404;
+        var ret = { error: e.message };
+        res.status(retCode).json(ret);
+    }
+});
+
 module.exports = RsoRouter;
