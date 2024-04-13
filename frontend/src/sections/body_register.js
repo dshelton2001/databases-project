@@ -57,7 +57,7 @@ const RegisterBody = () => {
     }
 
     return (
-        <div>
+        <div class = "trueBody">
             <p>hello register now</p>
             <form onSubmit={tryRegister}>
                 <div>Username <input id="user" ref={(c) => username = c}></input></div>

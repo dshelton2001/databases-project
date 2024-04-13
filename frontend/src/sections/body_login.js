@@ -83,7 +83,7 @@ const LoginBody = () => {
 	},[]);
 
     return (
-        <div>
+        <div class = "trueBody">
             <p>hello login now</p>
             <form onSubmit={tryLogin}>
                 <div><label>Username</label> <input id="user" ref={(c) => username = c}/></div>

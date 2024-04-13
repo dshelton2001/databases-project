@@ -1,6 +1,9 @@
 import React from 'react';
 import Cookies from 'universal-cookie';
+import './body_rsofeed.css';
 const route = require('./route.js');
+const fakeDataCount = 100;
+const faking = true;
 
 const RSOFeed = () => {
     var search;
@@ -18,6 +21,22 @@ const RSOFeed = () => {
         // going to fill with fake data here
         if (!contents)
         {
+            var fakeData = [];
+
+            for (let i = 0; i < fakeDataCount; i++)
+            {
+                var faker = {
+                    Name: "The Ultimate Bot Group",
+                    Description: "The bots have taken over",
+                    RSOID: 69
+                };
+
+                fakeData.push(faker);
+            }
+
+            setResults(fakeData);
+            setMessage("Loaded real data!");
+            
             return;
         }
 
@@ -30,6 +49,12 @@ const RSOFeed = () => {
 
         var object = {search:search.value};
         var input = JSON.stringify(object);
+
+        if (faking)
+        {
+            fillTable()
+            return;
+        }
 
         try
         {
@@ -57,22 +82,55 @@ const RSOFeed = () => {
         return true;
     }
 
+    const pizazzName = (name) =>
+    {
+        if (!name || typeof name != "string")
+            name = "A Really Cool RSO";
+
+        return name;
+    }
+
+    const pizazzDesc = (desc) =>
+    {
+        
+        if (!desc || typeof desc != "string")
+            desc = "Check us out!";
+
+        return desc;
+    }
+
+    // to-do: use cookie to check for permissions
+    // or maybe do it when the rSO loads
+    const redirectRSO = (RSOID) =>
+    {
+        window.location = "/viewrso?rsoid=" + RSOID;
+    }
+
     return (
-        <div>
+        <div class = "trueBody">
             <p>hello welcome</p>
             <div>RSO Feed</div>
-            <div><form onSubmit={trySearch}>
+            <div id="searchBar"><form onSubmit={trySearch}>
                 <input id="search" ref={(c) => search = c}/>
                 <button>Search</button>
             </form></div><br/>
             <span id="result">{message}</span><br/>
-            <ul id = "searchResults">
+            <div id = "searchResults">
                 {
                     results.map((result) => (
-                        <li key={result.RSOID} id="searchResult">{result.Name}</li>
-                    )
-                )}
-            </ul>
+                        <div id="searchResult">
+                            <div id="name" onClick={() => redirectRSO(result.RSOID)}>
+                                {pizazzName(result.Name)}
+                            </div>
+                            <div id="shellDesc">
+                                <div id="desc">
+                                    {pizazzDesc(result.Description)}
+                                </div>
+                            </div>
+                        </div>
+                    ))
+                }
+            </div>
             
         </div>
     )

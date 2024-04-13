@@ -1,0 +1,70 @@
+/* the name of the RSO */
+#name {
+    display: inherit;
+
+    cursor: pointer;
+
+    width: 120px;
+    height: 108px;
+    padding-left: 1%;
+    margin: 0;
+
+    border-right-style:solid;
+    border-color: rgb(108, 108, 108);
+    font-size: 18px;
+    font-weight: 650;
+    color: white;
+
+    overflow: hidden;
+}
+
+/* the description of the RSO */
+#desc {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+
+    width: 100%;
+    height: 100%;
+    
+    overflow-wrap: break-word;
+    overflow: hidden;
+    -webkit-line-clamp: 5;
+}
+
+/* */
+#shellDesc {
+    display: inherit;
+
+    padding-left: 2%;
+    width: calc(94% - 120px);
+    height: 108px;
+}
+
+/* For each search results */
+#searchResult {
+    display: inherit;
+
+    padding-right: 4px;
+    border-radius: 4px;
+    border-width: 1%;
+    border-left-style: solid;
+    border-right-style: solid;
+    border-color: rgb(255, 202, 6);
+    box-sizing:border-box;
+    -moz-box-sizing:border-box;
+
+    background-color: rgb(25, 25, 25);
+    color: rgb(199, 199, 199);
+
+    width: 24%;
+    height: 114px;
+}
+
+/* For all search results */
+#searchResults {
+    display: inline-block;
+
+    width:94%;
+    padding-left: 3%;
+    padding-right: 3%;
+}

@@ -2,7 +2,7 @@ import React from 'react';
 
 const IndexBody = () => {
     return (
-        <div>hello welcome to me website</div>
+        <div class = "trueBody"><p>hello welcome to me website</p></div>
     )
 }
 

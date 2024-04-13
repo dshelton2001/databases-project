@@ -11,3 +11,33 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+body {
+  background-color: rgb(40, 40, 40);
+  color: rgb(200, 200, 200);
+}
+
+.trueBody {
+  min-height: calc(100vh - 63px);
+}
+
+button {
+  background-color: rgb(180,180,180);
+  border-radius: 6px;
+  border-width: 1px;
+  border-color: rgb(120, 120, 120);
+  border-style: solid;
+}
+
+header {
+  display: block;
+  background-color: black;
+}
+
+footer {
+  background-color: black;
+
+  text-align: center;
+
+  height: 25px;
+}
