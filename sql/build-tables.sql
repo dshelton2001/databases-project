@@ -34,7 +34,6 @@ CREATE TABLE `database-project`.Events
 	EventID INT NOT NULL AUTO_INCREMENT,
 	Name VARCHAR(30),
 	LocationName VARCHAR(30),
-	Time TIME,
 	Description VARCHAR(300),
 	PRIMARY KEY (EventID),
 	FOREIGN KEY (LocationName) REFERENCES Location(Name)
@@ -45,7 +44,7 @@ CREATE TABLE `database-project`.Comments
 	CommentID INT NOT NULL AUTO_INCREMENT,
 	EventID INT NOT NULL,
 	UID INT NOT NULL,
-	Time TIME,
+	Time DATETIME,
 	Comment VARCHAR(300),
 	PRIMARY KEY (CommentID),
 	FOREIGN KEY (EventID) REFERENCES Events(EventID),
@@ -84,6 +83,7 @@ CREATE TABLE `database-project`.RSOCreationHistory
 (
 	RSOID INT NOT NULL,
 	UID INT NOT NULL,
+	TimeCreated DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	FOREIGN KEY (RSOID) REFERENCES Events(RSO),
 	FOREIGN KEY (UID) REFERENCES Admins(UID)
 );
@@ -100,6 +100,7 @@ CREATE TABLE `database-project`.EventCreationHistory
 (
 	EventID INT NOT NULL,
 	UID INT NOT NULL,
+	TimeCreated DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	FOREIGN KEY (EventID) REFERENCES Events(EventID),
 	FOREIGN KEY (UID) REFERENCES Admins(UID)
 );

@@ -231,4 +231,36 @@ usersRouter.post('/makeadmin', function(req, res) {
 	}
 });
 
+usersRouter.post('/checkadmin', function(req, res) {
+    let retCode = 200;
+    let message = "User is not an admin.";
+
+    const { uid } = req.body;
+
+    try {
+        pool.getConnection(function(err, con) {
+            if (err) {
+                if (con) con.release();
+                throw err;
+            }
+            
+            const sql = "SELECT * FROM Admins WHERE UID = ?";
+            const values = [uid];
+            
+            con.query(sql, values, function (err, results) {
+                if (err) throw err;
+                con.release();
+                
+                if (results.length > 0) {
+                    message = "User is an admin.";
+                }
+                res.status(retCode).json({ message });
+            });
+        });
+    } catch(e) {
+        retCode = 500;
+        res.status(retCode).json({ error: e.message });
+    }
+});
+
 module.exports = usersRouter;

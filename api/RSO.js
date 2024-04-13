@@ -104,7 +104,7 @@ RsoRouter.post('/search', function(req,res)
     let retCode = 200;
     let message = "base message.";
 
-    const {name, getAll} = req.body;
+    const {search, getAll} = req.body;
 
     try
 	{	
@@ -120,7 +120,7 @@ RsoRouter.post('/search', function(req,res)
             
             con.query({
                 sql: "SELECT * FROM rsos WHERE Name LIKE ?",
-                values: ["%" + name + "%"]},
+                values: ["%" + search + "%"]},
             function (err, results) {
                 if(err)
                     throw err;
@@ -128,12 +128,13 @@ RsoRouter.post('/search', function(req,res)
                 
                 if(results[0])
                 {
-
+                    message = results.length + " result(s) for \"" + search + "\".";
+                    var ret = {results:results, message};
                 }
                 else
                 {
-                    retCode = 400;
-                    message = "Not found."
+                    retCode = 209;
+                    message = "No results for \"" + search + "\".";
                     var ret = {message};
                 }
                 res.status(retCode).json(ret);
@@ -240,5 +241,44 @@ RsoRouter.post('/unjoin', function(req, res) {
         res.status(retCode).json(ret);
     }
 });
+
+
+RsoRouter.post('/edit', function(req, res) {
+    let retCode = 200;
+    let message = "Base message.";
+
+    const { rsoid, name, description } = req.body; 
+
+    try {
+        // Start by contacting the pool
+        pool.getConnection(function(err, con) {
+            if (err) {
+                if (con) con.release();
+                throw err;
+            }
+            
+            const sql = "UPDATE rsos SET Name = ?, Description = ? WHERE RSOID = ?";
+            const values = [name, description, rsoid];
+            
+            con.query(sql, values, function (err, result) {
+                if (err) throw err;
+                con.release();
+                
+                if (result.affectedRows > 0) {
+                    message = "edit work.";
+                } else {
+                    retCode = 400;
+                    message = "edit no work.";
+                }
+                res.status(retCode).json({ message });
+            });
+        });
+    } catch(e) {
+        retCode = 500;
+        res.status(retCode).json({ error: e.message });
+    }
+});
+
+
 
 module.exports = RsoRouter;

@@ -43,7 +43,6 @@ const LoginBody = () => {
                 body: input,
                 headers: {'Content-Type': 'application/json'}
             });
-            console.log("parseee");
             var ret = JSON.parse(await response.text());
             setMessage(ret.message);
 
@@ -55,7 +54,6 @@ const LoginBody = () => {
             else
             {
                 setMessage(ret.uid);
-                console.log("loggggg");
                 const cookies = new Cookies();
                 cookies.set('login', ret.uid, 
                 {
