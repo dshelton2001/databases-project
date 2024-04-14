@@ -1,5 +1,6 @@
 import React from 'react';
 import Cookies from 'universal-cookie';
+import './login_register.css';
 const route = require('./route.js');
 
 const RegisterBody = () => {
@@ -7,10 +8,6 @@ const RegisterBody = () => {
     var password;
 
     const [message, setMessage] = React.useState('');
-
-    const redirectLogin = () => {
-		window.location.href = "/login"
-	}
 
     const tryRegister = async event =>
     {
@@ -36,7 +33,7 @@ const RegisterBody = () => {
             }
             else
             {
-                setMessage(ret.uid);
+                setMessage("Registered successfully. Redirecting...");
                 const cookies = new Cookies();
                 cookies.set('login', ret.uid, 
                 {
@@ -58,14 +55,13 @@ const RegisterBody = () => {
 
     return (
         <div class = "trueBody">
-            <p>hello register now</p>
-            <form onSubmit={tryRegister}>
-                <div>Username <input id="user" ref={(c) => username = c}></input></div>
-                <div> Password <input type="password" id="pass" ref={(c) => password = c}></input></div>
-                <span id="result">{message}</span><br/>
-                <button>Register</button>
+            <p id="whatdo">hello register now</p>
+            <form id="dothing" onSubmit={tryRegister}>
+                <div class="user">Username <input id="user" ref={(c) => username = c}></input></div>
+                <div class="pass">Password <input type="password" id="pass" ref={(c) => password = c}></input></div>
+                <span class="result">{message}</span><br/>
+                <button id="submit">Register</button>
             </form>
-            <button onClick = {redirectLogin}>Login</button>
         </div>
     )
 

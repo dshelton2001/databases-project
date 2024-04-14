@@ -1,0 +1,53 @@
+header {
+    background-color: black;
+}
+
+.header {
+    overflow: hidden;
+
+    padding: 10px 15px;
+}
+
+.header a {
+    float: left;
+    background-color: rgba(255, 201, 6, 0.5);
+    color: white;
+    text-align: center;
+    text-decoration: none;
+
+    border-radius: 4px;
+    line-height: 25px;
+    padding: 4px;
+
+    cursor:pointer;
+}
+
+.header a:hover {
+    background-color:rgba(255, 201, 6, 0.7);
+    color:white;
+}
+
+.header #buttons {
+    float: right;
+}
+
+@media screen and (max-width: 500px) {
+    .header a {
+        float: none;
+        display: block;
+        text-align: left;
+    }
+
+    .header #buttons {
+        float: none;
+    }
+}
+
+#logo {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.header #logo {
+    background-color:black;
+}

@@ -1,10 +1,16 @@
 import React from 'react';
 import Cookies from 'universal-cookie';
+import './header.css';
 
 const DefaultHeader = () => {
 	const redirectHome = () => {
 		window.location.href = "/home"
 	}
+
+	const redirectIndex = () => {
+		window.location.href = "/"
+	}
+
 
 	const redirectLogout = () => {
 		const cookies = new Cookies();
@@ -26,6 +32,8 @@ const DefaultHeader = () => {
 		return false;
 	}
 
+	// React.useEffect() makes it run once the webpage loads
+	// This way, we cannot avoid loading user information
 	React.useEffect(() => {
 		return () => {
 			if (!checkForCookie())
@@ -37,9 +45,12 @@ const DefaultHeader = () => {
 
 	return (
 		<header>
-			<div>
-				<button onClick = {redirectHome}>Home</button>
-				<button onClick = {redirectLogout}>Logout</button>
+			<div class = "header">
+				<a id="logo" onClick={redirectIndex}>The Database</a>
+				<div id="buttons">
+				<a id="hbutton" onClick={redirectHome}>Search</a>
+					<a id="hbutton" onClick={redirectLogout}>Logout</a>
+				</div>
 			</div>
 		</header>
 	);

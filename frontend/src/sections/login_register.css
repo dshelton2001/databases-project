@@ -1,0 +1,19 @@
+#dothing {
+    text-align: center;
+}
+
+#whatdo {
+    text-align: center;
+}
+
+.result {
+    font-size: 24px;
+    
+    width: 100px;
+    height: 200px;
+}
+
+#submit {
+    font-size: 28px;
+    width: 200px;
+}

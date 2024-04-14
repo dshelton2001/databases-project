@@ -109,12 +109,16 @@ const RSOFeed = () => {
     return (
         <div class = "trueBody">
             <p>hello welcome</p>
-            <div>RSO Feed</div>
-            <div id="searchBar"><form onSubmit={trySearch}>
-                <input id="search" ref={(c) => search = c}/>
-                <button>Search</button>
-            </form></div><br/>
-            <span id="result">{message}</span><br/>
+            <div id="searchText">RSO Feed</div>
+            <form onSubmit={trySearch}>
+                <div id="searchBar">
+                    <input id="search" ref={(c) => search = c}/>
+                </div>
+                <div id="searchBar">
+                    <button id="sbutton">Search</button>
+                </div>
+            </form><br/>
+            <p id="result">{message}</p>
             <div id = "searchResults">
                 {
                     results.map((result) => (
