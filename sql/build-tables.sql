@@ -103,4 +103,3 @@ CREATE TABLE `database-project`.EventCreationHistory
 	FOREIGN KEY (EventID) REFERENCES Events(EventID),
 	FOREIGN KEY (UID) REFERENCES Admins(UID)
 );
-

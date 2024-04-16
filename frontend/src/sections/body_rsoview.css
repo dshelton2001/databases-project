@@ -1,0 +1,36 @@
+.title {
+    display: inline-block;
+
+    vertical-align: middle;
+
+    padding: 0px;
+    margin: 0px;
+}
+
+bold {
+    font-weight: 1000;
+}
+
+#member {
+    vertical-align: middle;
+
+    font-style: italic;
+    font-size: 10px;
+}
+
+#activity {
+    display: block;
+    color: red;
+
+    margin-top: 20px;
+    padding-top: 0;
+    font-style: italic;
+}
+
+#lessPadding {
+    margin-top: 0;
+}
+
+.mainDesc {
+    display: inline-block;
+}
