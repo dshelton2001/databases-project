@@ -47,7 +47,6 @@ CREATE TABLE `database-project`.Comments
 	Time DATETIME,
 	Comment VARCHAR(300),
 	PRIMARY KEY (CommentID),
-	FOREIGN KEY (EventID) REFERENCES Events(EventID),
 	FOREIGN KEY (UID) REFERENCES Users(UID)
 );
 

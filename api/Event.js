@@ -82,12 +82,13 @@ EventRouter.post('/create', function(req, res) {
 });
 
 
-EventRouter.post('/RSOcreate', function(req, res) 
-{
+EventRouter.post('/RSOcreate', function(req, res) {
     let retCode = 200;
     let message = "";
 
-    const { eventID, rsoID } = req.body;
+    const { eventID, rsoID, uid } = req.body;
+    const currentTime = new Date(); 
+
     try {
         pool.getConnection(function(err, con) {
             if (err) {
@@ -96,9 +97,10 @@ EventRouter.post('/RSOcreate', function(req, res)
                 throw err;
             }
 
+            // Check if the user is the admin of the specified RSO
             con.query({
-                sql: "INSERT INTO RSOEvents (EventID, RSOID) VALUES (?, ?)",
-                values: [eventID, rsoID]
+                sql: "SELECT * FROM RSOCreationHistory WHERE RSOID = ? AND UID = ?",
+                values: [rsoID, uid]
             }, function(err, results) {
                 if (err) {
                     if (con)
@@ -106,24 +108,71 @@ EventRouter.post('/RSOcreate', function(req, res)
                     throw err;
                 }
 
-                if (results && results.affectedRows > 0) {
-                    retCode = 201;
-                    message = "RSO event created successfully.";
-                } else {
-                    retCode = 409;
-                    message = "Failed to create RSO event.";
+                if (results.length === 0) {
+                    retCode = 403; // Forbidden
+                    message = "You are not authorized to create an event for this RSO.";
+                    const ret = { message };
+                    return res.status(retCode).json(ret);
                 }
 
-                const ret = { message };
-                res.status(retCode).json(ret);
+                // Retrieve events associated with the same RSO
+                con.query({
+                    sql: "SELECT E.EventID, E.Name, E.LocationName, E.Description, E.Time " +
+                        "FROM Events AS E INNER JOIN RSOEvents AS R ON E.EventID = R.EventID " +
+                        "WHERE R.RSOID = ?",
+                    values: [rsoID]
+                }, function(err, results) {
+                    if (err) {
+                        if (con)
+                            con.release();
+                        throw err;
+                    }
+
+                    // Check for overlapping event times
+                    const overlappingEvent = results.find(event => {
+                        const eventTime = new Date(event.Time);
+                        return eventTime.getTime() === currentTime.getTime();
+                    });
+
+                    if (overlappingEvent) {
+                        retCode = 409;
+                        message = "An event in the same RSO is already scheduled at this time.";
+                        const ret = { message };
+                        res.status(retCode).json(ret);
+                    } else {
+                        con.query({
+                            sql: "INSERT INTO RSOEvents (EventID, RSOID) VALUES (?, ?)",
+                            values: [eventID, rsoID]
+                        }, function(err, results) {
+                            if (err) {
+                                if (con)
+                                    con.release();
+                                throw err;
+                            }
+
+                            if (results && results.affectedRows > 0) {
+                                retCode = 201;
+                                message = "RSO event created successfully.";
+                            } else {
+                                retCode = 409;
+                                message = "Failed to create RSO event.";
+                            }
+
+                            const ret = { message };
+                            res.status(retCode).json(ret);
+                        });
+                    }
+                });
             });
         });
     } catch (e) {
         retCode = 404;
-        var ret = { error: e.message };
+        const ret = { error: e.message };
         res.status(retCode).json(ret);
     }
 });
+
+
 
 EventRouter.post('/comment', function(req,res)
 {
@@ -208,6 +257,47 @@ EventRouter.post('/search', function(req, res)
         retCode = 404;
         var ret = { error: e.message };
         res.status(retCode).json(ret);
+    }
+});
+
+EventRouter.post('/editcomment', function(req, res) {
+    console.log("Editing comment");
+    let retCode = 200;
+    let message = "";
+    const { commentID, comment } = req.body; 
+
+    try {
+        pool.getConnection(function(err, con) {
+            if (err) {
+                if (con)
+                    con.release();
+                throw err;
+            }
+            con.query({
+                    sql: "UPDATE Comments SET Comment = ? WHERE CommentID = ?",
+                    values: [comment, commentID]
+                },
+                function(err, results) {
+                    if (err) {
+                        if (con)
+                            con.release();
+                        throw err;
+                    }
+
+                    if (results && results.affectedRows > 0) {
+                        retCode = 200;
+                        message = "Comment updated successfully.";
+                    } else {
+                        retCode = 404;
+                        message = "Comment not found.";
+                    }
+
+                    res.status(retCode).json({ message });
+                });
+        });
+    } catch (e) {
+        retCode = 500;
+        res.status(retCode).json({ error: e.message });
     }
 });
 

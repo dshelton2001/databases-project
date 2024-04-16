@@ -279,6 +279,56 @@ RsoRouter.post('/edit', function(req, res) {
     }
 });
 
+RsoRouter.post('/checkStatus', function(req, res) {
+    let retCode = 200;
+    let message = "";
+
+    const { rsoID } = req.body; 
+
+    if (!rsoID) {
+        retCode = 400;
+        message = "RSO ID is required.";
+        return res.status(retCode).json({ message });
+    }
+
+    try {
+        pool.getConnection(function(err, con) {
+            if (err) {
+                if (con)
+                    con.release();
+                throw err;
+            }
+
+            con.query({
+                sql: "SELECT COUNT(UID) AS memberCount FROM RSOMembers WHERE RSOID = ?",
+                values: [rsoID]
+            }, function(err, results) {
+                if (err) {
+                    if (con)
+                        con.release();
+                    throw err;
+                }
+
+                if (results.length === 0) {
+                    retCode = 404;
+                    message = "RSO not found.";
+                    return res.status(retCode).json({ message });
+                }
+
+                const memberCount = results[0].memberCount;
+                const isActive = memberCount >= 5 ? true : false;
+
+                const ret = { rsoID, memberCount, isActive };
+                res.status(retCode).json(ret);
+            });
+        });
+    } catch (e) {
+        retCode = 500;
+        const ret = { error: e.message };
+        res.status(retCode).json(ret);
+    }
+});
+
 
 
 module.exports = RsoRouter;
