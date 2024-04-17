@@ -6,6 +6,7 @@ import Login from './pages/login';
 import Register from './pages/register';
 import RSOFeed from './pages/rsofeed';
 import RSOView from './pages/rsoview';
+import EventView from './pages/eventview';
 
 function App ()
 {
@@ -18,6 +19,7 @@ function App ()
 
 				<Route path="/home" element={<RSOFeed />} />
 				<Route path="/viewrso" element={<RSOView />} />
+				<Route path="/viewevent" element={<EventView />} />
 			</Routes>
 		</BrowserRouter>
 	);
