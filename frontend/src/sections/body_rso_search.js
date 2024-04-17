@@ -1,11 +1,11 @@
 import React from 'react';
 import Cookies from 'universal-cookie';
-import './body_rsofeed.css';
+import './body_rso_search.css';
 const route = require('./route.js');
 const fakeDataCount = 100;
 const faking = false;
 
-const RSOFeed = () => {
+const RSOSearch = () => {
     var search;
 
     const [message, setMessage] = React.useState('');
@@ -103,17 +103,17 @@ const RSOFeed = () => {
     // or maybe do it when the rSO loads
     const redirectRSO = (RSOID) =>
     {
-        window.location = "/viewrso?rsoid=" + RSOID;
+        window.location = "/rso/view?rsoid=" + RSOID;
     }
 
     return (
         <div class = "trueBody">
-            <div class="menuText">RSO Feed</div>
+            <div class="menuText">RSO Search</div>
             <form onSubmit={trySearch}>
                 <div id="searchBar">
                     <input id="search" ref={(c) => search = c}/>
                 </div>
-                <div id="searchBar">
+                <div id="searchButton">
                     <button id="sbutton">Search</button>
                 </div>
             </form><br/>
@@ -140,4 +140,4 @@ const RSOFeed = () => {
 
 }
 
-export default RSOFeed;
+export default RSOSearch;

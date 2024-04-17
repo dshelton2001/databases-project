@@ -1,17 +1,17 @@
 import React from 'react';
 
 import AccountHeader from '../sections/header_account';
-import RSOFeedBody from '../sections/body_rsofeed';
+import RSOViewBody from '../sections/body_rso_view';
 import DefaultFooter from '../sections/footer_default';
 
-const RSOFeed = () => {
+const RSOView = () => {
     return (
         <div>
             <AccountHeader />
-            <RSOFeedBody />
+            <RSOViewBody />
             <DefaultFooter />
         </div>
     )
 }
 
-export default RSOFeed;
+export default RSOView;

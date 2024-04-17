@@ -92,14 +92,29 @@
     width: 100%;
 }
 
+#searchButton {
+    display: flex;
+    width: 100%;
+}
+
 #search {
-    width: 200px;
     display: inline-block;
+
+    border-radius: 8px;
+
     margin: 0 auto;
+    width: 300px;
+
+    font-size: 24px;
 }
 
 #sbutton {
     width: 100px;
+
     display: inline-block;
     margin: 0 auto;
+    margin-top: 2px;
+
+    font-size: 24px;
+    width: 180px;
 }

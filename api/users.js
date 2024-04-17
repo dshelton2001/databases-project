@@ -300,4 +300,43 @@ usersRouter.post('/checksuperadmin', function(req, res) {
     }
 });
 
+// HERE YOU GO
+usersRouter.post('/RSOusers', function(req, res) {
+    const { rsoID } = req.body;
+
+    try {
+        pool.getConnection(function(err, con) {
+            if (err) {
+                if (con)
+                    con.release();
+                throw err;
+            }
+
+            con.query({
+                sql: "SELECT COUNT(*) AS userCount FROM RSOMembers WHERE RSOID = ?",
+                values: [rsoID]
+            }, function(err, results) {
+                if (err) {
+                    if (con)
+                        con.release();
+                    throw err;
+                }
+
+                if (results.length === 0) {
+                    const message = "No users found for the specified RSO ID.";
+                    return res.status(404).json({ message });
+                }
+
+                const userCount = results[0].userCount;
+
+                res.status(200).json({ userCount });
+            });
+        });
+    } catch (e) {
+        const ret = { error: e.message };
+        res.status(500).json(ret);
+    }
+});
+
+
 module.exports = usersRouter;

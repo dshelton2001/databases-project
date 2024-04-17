@@ -1,6 +1,5 @@
 import React from 'react';
 import Cookies from 'universal-cookie';
-import './body_rsofeed.css';
 const route = require('./route.js');
 
 const RSOFeed = () => {

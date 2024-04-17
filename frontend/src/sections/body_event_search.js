@@ -1,23 +1,16 @@
 import React from 'react';
 import Cookies from 'universal-cookie';
+import './body_rso_search.css';
 const route = require('./route.js');
 const fakeDataCount = 100;
-const faking = true;
+const faking = false;
 
-const RSOFeed = () => {
-    var search = "";
+const RSOSearch = () => {
+    var search;
 
     const [message, setMessage] = React.useState('');
     const [results, setResults] = React.useState([]);
     
-    const redirectHome = () => {
-		window.location.href = "/home";
-	}
-
-    const redirectAdmin = () => {
-		window.location.href = "/admin";
-	}
-
     const emptyTable = () =>
     {
         setResults([]);
@@ -50,9 +43,15 @@ const RSOFeed = () => {
         setResults(contents);
     }
 
-    const tryGetManagedRSOs = async event =>
+    const trySearch = async event =>
     {
-        var object = {search:search.value};
+        if (event)
+            event.preventDefault();
+
+        const cookies = new Cookies();
+		var cookie = cookies.get('login');
+
+        var object = {uid:cookie, search: search.value};
         var input = JSON.stringify(object);
 
         if (faking)
@@ -63,12 +62,12 @@ const RSOFeed = () => {
 
         try
         {
-            // need an api to pull RSO's they are an admin for instead
-            const response = await fetch(route.buildRoute('/api/rso/search'), {
+            const response = await fetch(route.buildRoute('/api/event/searchseeable'), {
                 method:'post',
                 body: input,
                 headers: {'Content-Type': 'application/json'}
             });
+
 
             var ret = JSON.parse(await response.text());
             setMessage(ret.message);
@@ -91,7 +90,7 @@ const RSOFeed = () => {
     const pizazzName = (name) =>
     {
         if (!name || typeof name != "string")
-            name = "A Really Cool RSO";
+            name = "A Really Cool Event";
 
         return name;
     }
@@ -100,67 +99,35 @@ const RSOFeed = () => {
     {
         
         if (!desc || typeof desc != "string")
-            desc = "Check us out!";
+            desc = "Check it out!";
 
         return desc;
     }
 
     // to-do: use cookie to check for permissions
     // or maybe do it when the rSO loads
-    const redirectRSO = (RSOID) =>
+    const redirectRSO = (EVENTID) =>
     {
-        window.location = "/admin/managerso?rsoid=" + RSOID;
+        window.location = "/event/view?eventid=" + EVENTID;
     }
-
-    const checkForAdmin = async event =>
-	{
-		const cookies = new Cookies();
-		var cookie = cookies.get('login');
-
-		var object = { uid: cookie };
-		var input = JSON.stringify(object);
-
-		try
-        {
-            const response = await fetch(route.buildRoute('/api/users/checkadmin'), {
-                method:'post',
-                body: input,
-                headers: {'Content-Type': 'application/json'}
-            });
-
-            var ret = JSON.parse(await response.text());
-
-			if (!ret.isAdmin)
-			{
-				redirectHome();
-			}
-        }
-        catch(e)
-        {
-            alert(e.toString());
-            
-            redirectHome();
-        }
-	}
-
-    React.useEffect(() => {
-		return () => {
-			checkForAdmin();
-
-            tryGetManagedRSOs();
-		};
-	},[]);
 
     return (
         <div class = "trueBody">
-            <div class="menuText">Manage RSO's</div>
-            <div class="adminBack">< button onClick={redirectAdmin} class="adminBackButton">Back</button></div>
+            <div class="menuText">Events</div>
+            <form onSubmit={trySearch}>
+                <div id="searchBar">
+                    <input id="search" ref={(c) => search = c}/>
+                </div>
+                <div id="searchButton">
+                    <button id="sbutton">Search</button>
+                </div>
+            </form><br/>
             <p id="result">{message}</p>
             <div id = "searchResults">
                 {
                     results.map((result) => (
                         <div id="searchResult">
-                            <div id="name" onClick={() => redirectRSO(result.RSOID)}>
+                            <div id="name" onClick={() => redirectRSO(result.EventID)}>
                                 {pizazzName(result.Name)}
                             </div>
                             <div id="shellDesc">
@@ -172,9 +139,10 @@ const RSOFeed = () => {
                     ))
                 }
             </div>
+            
         </div>
     )
 
 }
 
-export default RSOFeed;
+export default RSOSearch;

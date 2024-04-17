@@ -40,11 +40,13 @@ app.use(bodyParser.json());
 const usersRouter = require("./api/users");
 const rsoRouter = require("./api/RSO");
 const eventRouter = require("./api/Event");
+const commentRouter = require("./api/comment");
 
 // activate routers
 app.use("/api/users", usersRouter);
 app.use("/api/rso", rsoRouter);
 app.use("/api/event", eventRouter);
+app.use("/api/comment", commentRouter);
 
 // yippee!
 app.listen(PORT, () => {

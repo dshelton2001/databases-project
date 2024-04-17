@@ -87,7 +87,6 @@ EventRouter.post('/RSOcreate', function(req, res) {
     let message = "";
 
     const { eventID, rsoID, uid } = req.body;
-    const currentTime = new Date(); 
 
     try {
         pool.getConnection(function(err, con) {
@@ -96,31 +95,20 @@ EventRouter.post('/RSOcreate', function(req, res) {
                     con.release();
                 throw err;
             }
-
-            // Check if the user is the admin of the specified RSO
             con.query({
-                sql: "SELECT * FROM RSOCreationHistory WHERE RSOID = ? AND UID = ?",
-                values: [rsoID, uid]
-            }, function(err, results) {
+                sql: "SELECT Time FROM Events WHERE EventID = ?",
+                values: [eventID]
+            }, function(err, eventResult) {
                 if (err) {
                     if (con)
                         con.release();
                     throw err;
                 }
-
-                if (results.length === 0) {
-                    retCode = 403; // Forbidden
-                    message = "You are not authorized to create an event for this RSO.";
-                    const ret = { message };
-                    return res.status(retCode).json(ret);
-                }
-
-                // Retrieve events associated with the same RSO
+                var eventTime = eventResult[0].Time;
+                // Check if the user is the admin of the specified RSO
                 con.query({
-                    sql: "SELECT E.EventID, E.Name, E.LocationName, E.Description, E.Time " +
-                        "FROM Events AS E INNER JOIN RSOEvents AS R ON E.EventID = R.EventID " +
-                        "WHERE R.RSOID = ?",
-                    values: [rsoID]
+                    sql: "SELECT * FROM RSOCreationHistory WHERE RSOID = ? AND UID = ?",
+                    values: [rsoID, uid]
                 }, function(err, results) {
                     if (err) {
                         if (con)
@@ -128,40 +116,61 @@ EventRouter.post('/RSOcreate', function(req, res) {
                         throw err;
                     }
 
-                    // Check for overlapping event times
-                    const overlappingEvent = results.find(event => {
-                        const eventTime = new Date(event.Time);
-                        return eventTime.getTime() === currentTime.getTime();
-                    });
-
-                    if (overlappingEvent) {
-                        retCode = 409;
-                        message = "An event in the same RSO is already scheduled at this time.";
+                    if (results.length === 0) {
+                        retCode = 403; 
+                        message = "You are not authorized to create an event for this RSO.";
                         const ret = { message };
-                        res.status(retCode).json(ret);
-                    } else {
-                        con.query({
-                            sql: "INSERT INTO RSOEvents (EventID, RSOID) VALUES (?, ?)",
-                            values: [eventID, rsoID]
-                        }, function(err, results) {
-                            if (err) {
-                                if (con)
-                                    con.release();
-                                throw err;
-                            }
+                        return res.status(retCode).json(ret);
+                    }
 
-                            if (results && results.affectedRows > 0) {
-                                retCode = 201;
-                                message = "RSO event created successfully.";
-                            } else {
-                                retCode = 409;
-                                message = "Failed to create RSO event.";
-                            }
+                    // Retrieve events associated with the same RSO
+                    con.query({
+                        sql: "SELECT E.EventID, E.Name, E.LocationName, E.Description, E.Time " +
+                            "FROM Events AS E INNER JOIN RSOEvents AS R ON E.EventID = R.EventID " +
+                            "WHERE R.RSOID = ? AND E.Time = ?",
+                        values: [rsoID, eventTime]
+                    }, function(err, results) {
+                        if (err) {
+                            if (con)
+                                con.release();
+                            throw err;
+                        }
 
+                        // Check for overlapping event times
+                        const overlappingEvent = results.find(event => {
+                            const eventTime2 = (event.Time);
+                            return eventTime === eventTime2;
+                        });
+
+                        if (overlappingEvent) {
+                            retCode = 409;
+                            message = "An event in the same RSO is already scheduled at this time.";
                             const ret = { message };
                             res.status(retCode).json(ret);
-                        });
-                    }
+                        } else {
+                            con.query({
+                                sql: "INSERT INTO RSOEvents (EventID, RSOID) VALUES (?, ?)",
+                                values: [eventID, rsoID]
+                            }, function(err, results) {
+                                if (err) {
+                                    if (con)
+                                        con.release();
+                                    throw err;
+                                }
+
+                                if (results && results.affectedRows > 0) {
+                                    retCode = 201;
+                                    message = "RSO event created successfully.";
+                                } else {
+                                    retCode = 409;
+                                    message = "Failed to create RSO event.";
+                                }
+
+                                const ret = { message };
+                                res.status(retCode).json(ret);
+                            });
+                        }
+                    });
                 });
             });
         });
@@ -173,62 +182,15 @@ EventRouter.post('/RSOcreate', function(req, res) {
 });
 
 
-
-EventRouter.post('/comment', function(req,res)
-{
-    console.log("hello");
-    let retCode = 200;
-    let message = "";
-    const{eventID,uid,time,comment} = req.body;
-
-    try
-    {
-        pool.getConnection(function(err, con) {
-            if (err)
-            {
-                if (con)
-                    con.release();
-                throw err;
-            }
-        con.query({sql: "INSERT IGNORE INTO Comments SET ?", values: {EventID: eventID,UID: uid,Time: time,Comment: comment}},
-            function (err,results) {
-                if (err)
-                {
-                    if (con)
-                        con.release();
-                    throw err;
-                }
-
-                if(results && results.affectedRows > 0)
-                {
-                    retCode = 200;
-                }
-                else
-                {
-                    retCode = 409;
-                    message = "comment failed to be made.";
-                    var ret = {message};
-                }
-
-                res.status(retCode).json(ret);
-            });
-        });
-    }
-    catch(e)
-    {
-		retCode = 404;
-		var ret = {error: e.message};
-
-		res.status(retCode).json(ret);
-	}
-});
-
 EventRouter.post('/search', function(req, res) 
 {
     let retCode = 200;
-    let message = "base message.";
+    let message = "";
 
     const { search } = req.body;
+
+    console.log("Starting EVENTSEARCH for term " + search);
+
     try {
         pool.getConnection(function(err, con) {
             if (err) {
@@ -250,7 +212,9 @@ EventRouter.post('/search', function(req, res)
                     throw err;
                 }
 
-                res.status(retCode).json(results);
+                var ret = {results, message};
+
+                res.status(retCode).json(ret);
             });
         });
     } catch (e) {
@@ -260,40 +224,38 @@ EventRouter.post('/search', function(req, res)
     }
 });
 
-EventRouter.post('/editcomment', function(req, res) {
-    console.log("Editing comment");
+// we'll need to make a fork of this that pulls from all rsos the user is a part of
+EventRouter.get('/RSOsearch', function(req, res) 
+{
     let retCode = 200;
     let message = "";
-    const { commentID, comment } = req.body; 
+    const { RSOID } = req.body;
 
     try {
         pool.getConnection(function(err, con) {
             if (err) {
-                if (con)
-                    con.release();
+                if (con) con.release();
                 throw err;
             }
             con.query({
-                    sql: "UPDATE Comments SET Comment = ? WHERE CommentID = ?",
-                    values: [comment, commentID]
+                    sql: "SELECT * FROM RSOEvents WHERE RSOID = ?",
+                    values: [RSOID]
                 },
                 function(err, results) {
                     if (err) {
-                        if (con)
-                            con.release();
+                        if (con) con.release();
                         throw err;
                     }
-
-                    if (results && results.affectedRows > 0) {
+                    if (results && results.length > 0) {
                         retCode = 200;
-                        message = "Comment updated successfully.";
+                        message = "RSO Events retrieved successfully.";
                     } else {
                         retCode = 404;
-                        message = "Comment not found.";
+                        message = "No RSO events found for the specified RSOID.";
                     }
-
-                    res.status(retCode).json({ message });
-                });
+                    res.status(retCode).json({ message, results });
+                }
+            );
         });
     } catch (e) {
         retCode = 500;
@@ -301,5 +263,84 @@ EventRouter.post('/editcomment', function(req, res) {
     }
 });
 
+EventRouter.get('/allpublic', function(req, res) 
+{
+    let retCode = 200;
+    let message = "";
+
+    try {
+        pool.getConnection(function(err, con) {
+            if (err) {
+                if (con) con.release();
+                throw err;
+            }
+            con.query({
+                    sql: "SELECT * FROM PublicEvents"
+                },
+                function(err, results) {
+                    if (err) {
+                        if (con) con.release();
+                        throw err;
+                    }
+                    if (results && results.length > 0) {
+                        retCode = 200;
+                        message = "Public events retrieved successfully.";
+                    } else {
+                        retCode = 404;
+                        message = "No public events found.";
+                    }
+                    res.status(retCode).json({ message, results });
+                }
+            );
+        });
+    } catch (e) {
+        retCode = 500;
+        res.status(retCode).json({ error: e.message });
+    }
+});
+
+
+EventRouter.post('/searchseeable', function(req, res) 
+{
+    let retCode = 200;
+    let message = "";
+
+    const { search, uid } = req.body;
+
+    const searchTerm = `%${search}%`; 
+
+    console.log("Starting EVENTPUBLICSEARCH for term " + search);
+
+    try {
+        pool.getConnection(function(err, con) {
+            if (err) {
+                if (con) con.release();
+                throw err;
+            }
+            con.query({
+                    sql: "SELECT * FROM events WHERE (Name LIKE ? OR LocationName LIKE ?) AND (EXISTS (SELECT 1 FROM publicevents WHERE PublicEvents.EVENTID = Events.EVENTID) OR EXISTS (SELECT 1 FROM rsoevents WHERE rsoevents.EVENTID = events.EVENTID AND EXISTS (SELECT 1 FROM rsomembers WHERE rsomembers.UID = ?)))",
+                    values: [searchTerm, searchTerm, searchTerm, searchTerm, uid]
+                },
+                function(err, results) {
+                    if (err) {
+                        if (con) con.release();
+                        throw err;
+                    }
+                    if (results && results.length > 0) {
+                        retCode = 200;
+                        message = "All events retrieved successfully.";
+                    } else {
+                        retCode = 404;
+                        message = "No events found.";
+                    }
+                    res.status(retCode).json({ message, results });
+                }
+            );
+        });
+    } catch (e) {
+        retCode = 500;
+        res.status(retCode).json({ error: e.message });
+    }
+});
 
 module.exports = EventRouter;

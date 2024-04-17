@@ -1,17 +1,17 @@
 import React from 'react';
 
 import AccountHeader from '../sections/header_account';
-import EventViewBody from '../sections/body_eventview';
+import RSOMineBody from '../sections/body_rso_mine';
 import DefaultFooter from '../sections/footer_default';
 
-const EventView = () => {
+const RSOMine = () => {
     return (
         <div>
             <AccountHeader />
-            <EventViewBody />
+            <RSOMineBody />
             <DefaultFooter />
         </div>
     )
 }
 
-export default EventView;
+export default RSOMine;

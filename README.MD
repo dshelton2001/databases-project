@@ -1,4 +1,3 @@
-Term Project for COP4710
-By Julian, Dennis, and Morrigan
+Term Project for COP4710 by Julian and Dennis
 
 University Event Manager :)

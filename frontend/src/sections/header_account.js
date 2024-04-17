@@ -4,8 +4,16 @@ import './header.css';
 const route = require('./route.js');
 
 const DefaultHeader = () => {
-	const redirectHome = () => {
-		window.location.href = "/home";
+	const redirectRSOSearch = () => {
+		window.location.href = "/rso/search";
+	}
+
+	const redirectRSOMine = () => {
+		window.location.href = "/rso/acct";
+	}
+
+	const redirectEventSearch = () => {
+		window.location.href = "/event";
 	}
 
 	const redirectIndex = () => {
@@ -85,10 +93,10 @@ const DefaultHeader = () => {
 			<div class = "header">
 				<a id="logo" onClick={redirectIndex}>The Database</a>
 				<div id="buttons">
-					<a id="hbutton" onClick={redirectHome}>My RSO's</a>
-					<a id="hbutton" onClick={redirectHome}>Events</a>
+					<a id="hbutton" onClick={redirectRSOMine}>My RSO's</a>
+					<a id="hbutton" onClick={redirectEventSearch}>Events</a>
+					<a id="hbutton" onClick={redirectRSOSearch}>RSO Search</a>
 					<b id="hspace"/>
-					<a id="hbutton" onClick={redirectHome}>RSO Search</a>
 					<a id="hbutton" class="admin" onClick={redirectAdmin}>Manage</a>
 					<b id="hspace"/>
 					<a id="hbutton" onClick={redirectLogout}>Logout</a>

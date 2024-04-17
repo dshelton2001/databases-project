@@ -1,6 +1,5 @@
 import React from 'react';
 import Cookies from 'universal-cookie';
-import './body_rsoview.css';
 var url = require('url');
 const route = require('./route.js');
 const fakeEventCount = 20;
@@ -10,36 +9,33 @@ const RSOViewBody = () => {
     var rsoid;
     const [message, setMessage] = React.useState('');
     const [result, setResult] = React.useState({});
-    const [events, setEvents] = React.useState([]);
+    const [comments, setComments] = React.useState([]);
 
     const fillData = (contents) =>
     {
         if (!contents || contents === null)
         {
-            const memberCount = 5;
             var fakeRSO = {
-                Name: "HAHAHA THE ULTIMATE RSO",
-                Description: "IT IS I, THE ULTIMATE RSO!!!! We want to have fun and talk to you n all that :)",
-                memberCount: memberCount,
-                active: memberCount > 4? true : false
-            };
+                Name: "HAHAHA THE ULTIMATE EVENT",
+                Description: "IT IS I, THE ULTIMATE EVENT!!!! Please, go ahead and do the thing :)",
+                Time: formatDate(new Date())
+            }
 
             setResult(fakeRSO);
 
-            var fakeEvents = [];
+            var fakeComments = [];
 
             for (let i = 0; i < fakeEventCount; i++)
             {
                 var faker = {
-                    Name: "The Ultimate Bot Event",
-                    Description: formatDate(new Date()) + " - The bots have taken over",
-                    EventID: 69
+                    Name: "Bot001",
+                    Comment: formatDate(new Date()) + " - Wow this looks fun!",
                 };
 
-                fakeEvents.push(faker);
+                fakeComments.push(faker);
             }
 
-            setEvents(fakeEvents);
+            setComments(fakeComments);
 
             return;
         }
@@ -67,23 +63,21 @@ const RSOViewBody = () => {
     return (
         <div class = "trueBody">
             <div id="profile">
-                <h1 class="title">{result.Name}</h1><div id="member">Members: <bold>{result.memberCount}</bold></div>
-                <div id="activity">{result.active? "" : "Not active"}</div>
-                <h2 class="descTitle">Description</h2>
+                <h1 class="title">{result.Name}</h1><a id="member"> - <bold>{result.Time}</bold></a><br/>
                 <p class="mainDesc">{result.Description}</p>
             </div>
-            
-            <h2 id="lessPadding">Events</h2>
+            <b id="activity"></b>
+            <h2 id="lessPadding">Comments</h2>
             <div id="searchResults">
             {
-                events.map((event) => (
+                comments.map((comment) => (
                     <div id="searchResult">
-                        <div id="name" onClick={() => redirectEvent(event.EventID)}>
-                            {event.Name}
+                        <div id="name">
+                            {comment.Name}
                         </div>
                         <div id="shellDesc">
                             <div id="desc">
-                                {event.Description}
+                                {comment.Comment}
                             </div>
                         </div>
                     </div>
