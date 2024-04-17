@@ -6,7 +6,7 @@ RsoRouter.post('/create', function(req,res)
 {
     let retCode = 200;
 	let message = "";
-    const {name, description, uid} =req.body;  
+    const {name, description, uid} = req.body;  
     
     console.log("Begin CREATE for RSO " + name);
 
@@ -65,11 +65,13 @@ RsoRouter.post('/create', function(req,res)
                                 if(resultsHistory && resultsHistory.affectedRows > 0)
                                 {
                                     retCode = 200;
+
+                                    var ret = {rsoid: results.insertId, message};
                                 }
                                 else
                                 {
                                     retCode = 409;
-                                    message = "failed in rso creation";
+                                    message = "Failed to create RSO.";
                                     var ret = {message};
                                 }
 

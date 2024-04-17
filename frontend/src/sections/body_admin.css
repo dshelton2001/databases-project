@@ -59,3 +59,40 @@
     }
 }
 
+.createRSO {
+    font-size: 24px;
+}
+
+.createRSO input {
+    width: calc(100% / 3);
+    font-size: 24px;
+
+    border-radius: 8px;
+    margin-bottom: 8px;
+}
+
+.createRSO textArea {
+    width: calc(100% / 3);
+    height: 200px;
+    font-size: 24px;
+
+    border-radius: 8px;
+    margin-bottom: 8px;
+}
+
+.createRSO #labelName {
+    margin-left: 43pt;
+}
+
+.createRSO #label {
+    display: inline-table;
+    width: calc(100% / 3);
+}
+
+.createRSO label {
+    padding-inline: 4pt;
+    float: right;
+    vertical-align: middle;
+
+    line-height: 25px;
+}
