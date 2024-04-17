@@ -234,8 +234,11 @@ usersRouter.post('/makeadmin', function(req, res) {
 usersRouter.post('/checkadmin', function(req, res) {
     let retCode = 200;
     let message = "User is not an admin.";
+	let isAdmin = false;
 
     const { uid } = req.body;
+
+	console.log("Begin CHECKADMIN for UID " + uid);
 
     try {
         pool.getConnection(function(err, con) {
@@ -253,6 +256,40 @@ usersRouter.post('/checkadmin', function(req, res) {
                 
                 if (results.length > 0) {
                     message = "User is an admin.";
+					isAdmin = true;
+                }
+				
+                res.status(retCode).json({ isAdmin, message });
+            });
+        });
+    } catch(e) {
+        retCode = 500;
+        res.status(retCode).json({ error: e.message });
+    }
+});
+
+usersRouter.post('/checksuperadmin', function(req, res) {
+    let retCode = 200;
+    let message = "User is not a superadmin.";
+
+    const { uid } = req.body;
+
+    try {
+        pool.getConnection(function(err, con) {
+            if (err) {
+                if (con) con.release();
+                throw err;
+            }
+            
+            const sql = "SELECT * FROM SuperAdmins WHERE UID = ?";
+            const values = [uid];
+            
+            con.query(sql, values, function (err, results) {
+                if (err) throw err;
+                con.release();
+                
+                if (results.length > 0) {
+                    message = "User is a superadmin.";
                 }
                 res.status(retCode).json({ message });
             });

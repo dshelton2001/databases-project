@@ -3,7 +3,7 @@ import Cookies from 'universal-cookie';
 import './body_rsofeed.css';
 const route = require('./route.js');
 const fakeDataCount = 100;
-const faking = true;
+const faking = false;
 
 const RSOFeed = () => {
     var search;
