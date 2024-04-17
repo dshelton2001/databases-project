@@ -382,4 +382,55 @@ RsoRouter.post('/checkStatus', function(req, res) {
     }
 });
 
+RsoRouter.post('/getmanaged', function(req,res)
+{
+    let retCode = 200;
+    let message = "base message.";
+
+    const {uid} = req.body;
+
+    try
+	{	
+		// start by contacting the pool
+		pool.getConnection(function(err, con) 
+        {
+			if (err)
+			{
+				if (con)
+					con.release();
+				throw err;
+			}
+            
+            con.query({
+                sql: "SELECT * FROM rsos WHERE EXISTS (SELECT 1 from rsocreationhistory WHERE rsos.RSOID = rsocreationhistory.RSOID AND rsocreationhistory.UID = ?)",
+                values: [uid]},
+            function (err, results) {
+                if(err)
+                    throw err;
+                con.release();
+                
+                if(results[0])
+                {
+                    message = results.length + " result(s) for managed RSO's.";
+                    var ret = {results:results, message};
+                }
+                else
+                {
+                    retCode = 209;
+                    message = "No results for managed RSO's. Create one!";
+                    var ret = {message};
+                }
+                res.status(retCode).json(ret);
+            })
+        });
+
+    }
+    catch(e)
+    {
+		retCode = 404;
+		var ret = {error: e.message};
+		res.status(retCode).json(ret);
+    }
+});
+
 module.exports = RsoRouter;

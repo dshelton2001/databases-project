@@ -2,7 +2,7 @@ import React from 'react';
 import Cookies from 'universal-cookie';
 const route = require('./route.js');
 const fakeDataCount = 100;
-const faking = true;
+const faking = false;
 
 const RSOFeed = () => {
     var search = "";
@@ -52,8 +52,11 @@ const RSOFeed = () => {
 
     const tryGetManagedRSOs = async event =>
     {
-        var object = {search:search.value};
-        var input = JSON.stringify(object);
+        const cookies = new Cookies();
+		var cookie = cookies.get('login');
+
+		var object = { uid: cookie };
+		var input = JSON.stringify(object);
 
         if (faking)
         {
@@ -64,7 +67,7 @@ const RSOFeed = () => {
         try
         {
             // need an api to pull RSO's they are an admin for instead
-            const response = await fetch(route.buildRoute('/api/rso/search'), {
+            const response = await fetch(route.buildRoute('/api/rso/getmanaged'), {
                 method:'post',
                 body: input,
                 headers: {'Content-Type': 'application/json'}

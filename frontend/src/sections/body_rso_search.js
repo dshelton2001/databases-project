@@ -134,10 +134,8 @@ const RSOSearch = () => {
                     ))
                 }
             </div>
-            
         </div>
     )
-
 }
 
 export default RSOSearch;
