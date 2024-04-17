@@ -57,7 +57,7 @@
     height: 112px;
 }
 
-@media screen and (max-width: 1500px) {
+@media screen and (max-width: 1000px) {
     #searchResult {
         width: 50%;
     }

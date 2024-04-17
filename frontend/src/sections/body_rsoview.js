@@ -16,12 +16,13 @@ const RSOViewBody = () => {
     {
         if (!contents || contents === null)
         {
+            const memberCount = 5;
             var fakeRSO = {
                 Name: "HAHAHA THE ULTIMATE RSO",
                 Description: "IT IS I, THE ULTIMATE RSO!!!! We want to have fun and talk to you n all that :)",
-                memberCount: 5,
-                active: true
-            }
+                memberCount: memberCount,
+                active: memberCount > 4? true : false
+            };
 
             setResult(fakeRSO);
 
@@ -66,10 +67,12 @@ const RSOViewBody = () => {
     return (
         <div class = "trueBody">
             <div id="profile">
-                <h1 class="title">{result.Name}</h1><a id="member"> - Members: <bold>{result.memberCount}</bold></a><br/>
+                <h1 class="title">{result.Name}</h1><div id="member">Members: <bold>{result.memberCount}</bold></div>
+                <div id="activity">{result.active? "" : "Not active"}</div>
+                <h2 class="descTitle">Description</h2>
                 <p class="mainDesc">{result.Description}</p>
             </div>
-            <b id="activity">{result.active? "" : "Not active"}</b>
+            
             <h2 id="lessPadding">Events</h2>
             <div id="searchResults">
             {

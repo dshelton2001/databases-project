@@ -19,7 +19,15 @@ header {
     line-height: 25px;
     padding: 4px;
 
-    cursor:pointer;
+    margin-left: 2px;
+
+    cursor: pointer;
+}
+
+#hspace {
+    float: left;
+
+    padding: 2px;
 }
 
 .header a:hover {

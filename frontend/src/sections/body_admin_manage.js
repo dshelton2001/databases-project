@@ -3,14 +3,22 @@ import Cookies from 'universal-cookie';
 import './body_rsofeed.css';
 const route = require('./route.js');
 const fakeDataCount = 100;
-const faking = false;
+const faking = true;
 
 const RSOFeed = () => {
-    var search;
+    var search = "";
 
     const [message, setMessage] = React.useState('');
     const [results, setResults] = React.useState([]);
     
+    const redirectHome = () => {
+		window.location.href = "/home";
+	}
+
+    const redirectAdmin = () => {
+		window.location.href = "/Admin";
+	}
+
     const emptyTable = () =>
     {
         setResults([]);
@@ -43,10 +51,8 @@ const RSOFeed = () => {
         setResults(contents);
     }
 
-    const trySearch = async event =>
+    const tryGetManagedRSOs = async event =>
     {
-        event.preventDefault();
-
         var object = {search:search.value};
         var input = JSON.stringify(object);
 
@@ -58,6 +64,7 @@ const RSOFeed = () => {
 
         try
         {
+            // need an api to pull RSO's they are an admin for instead
             const response = await fetch(route.buildRoute('/api/rso/search'), {
                 method:'post',
                 body: input,
@@ -103,20 +110,52 @@ const RSOFeed = () => {
     // or maybe do it when the rSO loads
     const redirectRSO = (RSOID) =>
     {
-        window.location = "/viewrso?rsoid=" + RSOID;
+        window.location = "/admin/managerso?rsoid=" + RSOID;
     }
+
+    const checkForAdmin = async event =>
+	{
+		const cookies = new Cookies();
+		var cookie = cookies.get('login');
+
+		var object = { uid: cookie };
+		var input = JSON.stringify(object);
+
+		try
+        {
+            const response = await fetch(route.buildRoute('/api/users/checkadmin'), {
+                method:'post',
+                body: input,
+                headers: {'Content-Type': 'application/json'}
+            });
+
+            var ret = JSON.parse(await response.text());
+
+			if (!ret.isAdmin)
+			{
+				redirectHome();
+			}
+        }
+        catch(e)
+        {
+            alert(e.toString());
+            
+            redirectHome();
+        }
+	}
+
+    React.useEffect(() => {
+		return () => {
+			checkForAdmin();
+
+            tryGetManagedRSOs();
+		};
+	},[]);
 
     return (
         <div class = "trueBody">
-            <div class="menuText">RSO Feed</div>
-            <form onSubmit={trySearch}>
-                <div id="searchBar">
-                    <input id="search" ref={(c) => search = c}/>
-                </div>
-                <div id="searchBar">
-                    <button id="sbutton">Search</button>
-                </div>
-            </form><br/>
+            <div class="menuText">Manage RSO's</div>
+            <div class="adminBack">< button onClick={redirectAdmin} class="adminBackButton">Back</button></div>
             <p id="result">{message}</p>
             <div id = "searchResults">
                 {

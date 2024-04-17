@@ -43,7 +43,6 @@ const LoginBody = () => {
 
             if (ret.uid === undefined)
             {
-                
                 return false;
             }
             else
@@ -79,11 +78,11 @@ const LoginBody = () => {
 
     return (
         <div class = "trueBody">
-            <p id="whatdo">hello login now</p>
-            <form id="dothing" onSubmit={tryLogin}>
+            <p class="loginText">Login</p>
+            <form class="dothing" onSubmit={tryLogin}>
                 <div id="mainLogin">
                     <div class="user"><label>Username</label> <input id="user" ref={(c) => username = c}/></div>
-                    <div class="pass"><label>Password</label> <input type="password" id="pass" ref={(c) => password = c}/></div>
+                    <div class="pass"><label id="passwordText">Password</label> <input type="password" id="pass" ref={(c) => password = c}/></div>
                 </div>
                 <span class="result">{message}</span><br/>
                 <button id="submit">Login</button>

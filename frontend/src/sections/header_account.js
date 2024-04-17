@@ -85,9 +85,13 @@ const DefaultHeader = () => {
 			<div class = "header">
 				<a id="logo" onClick={redirectIndex}>The Database</a>
 				<div id="buttons">
-				<a id="hbutton" onClick={redirectHome}>Search</a>
-				<a id="hbutton" class="admin" onClick={redirectAdmin}>Admin</a>
-				<a id="hbutton" onClick={redirectLogout}>Logout</a>
+					<a id="hbutton" onClick={redirectHome}>My RSO's</a>
+					<a id="hbutton" onClick={redirectHome}>Events</a>
+					<b id="hspace"/>
+					<a id="hbutton" onClick={redirectHome}>RSO Search</a>
+					<a id="hbutton" class="admin" onClick={redirectAdmin}>Manage</a>
+					<b id="hspace"/>
+					<a id="hbutton" onClick={redirectLogout}>Logout</a>
 				</div>
 			</div>
 		</header>

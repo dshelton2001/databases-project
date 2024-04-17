@@ -7,6 +7,9 @@ import Register from './pages/register';
 import RSOFeed from './pages/rsofeed';
 import RSOView from './pages/rsoview';
 import EventView from './pages/eventview';
+import Admin from './pages/admin';
+import AdminCreate from './pages/admin_create';
+import AdminManage from './pages/admin_manage';
 
 function App ()
 {
@@ -20,6 +23,10 @@ function App ()
 				<Route path="/home" element={<RSOFeed />} />
 				<Route path="/viewrso" element={<RSOView />} />
 				<Route path="/viewevent" element={<EventView />} />
+
+				<Route path="/admin" element={<Admin />} />
+				<Route path="/admin/create" element={<AdminCreate />} />
+				<Route path="/admin/manage" element={<AdminManage />} />
 			</Routes>
 		</BrowserRouter>
 	);

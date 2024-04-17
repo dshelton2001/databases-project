@@ -36,3 +36,17 @@ footer {
 
   height: 25px;
 }
+
+.menuText {
+  text-align: center;
+  font-size: 48px;
+  font-weight: 900;
+
+  padding-bottom: 80px;
+}
+
+.loginText {
+  text-align: center;
+  font-size: 48px;
+  font-weight: 900;
+}

@@ -55,11 +55,11 @@ const RegisterBody = () => {
 
     return (
         <div class = "trueBody">
-            <p id="whatdo">hello register now</p>
-            <form id="dothing" onSubmit={tryRegister}>
-                <div class="user">Username <input id="user" ref={(c) => username = c}></input></div>
-                <div class="pass">Password <input type="password" id="pass" ref={(c) => password = c}></input></div>
-                <span class="result">{message}</span><br/>
+            <p class="loginText">Register</p>
+            <form class="dothing" onSubmit={tryRegister}>
+                <div class="user"><label>Username </label><input id="user" ref={(c) => username = c}></input></div>
+                <div class="pass"><label id="passwordText">Password </label><input type="password" id="pass" ref={(c) => password = c}></input></div>
+                <span class="result" id="result">{message}</span><br/>
                 <button id="submit">Register</button>
             </form>
         </div>
