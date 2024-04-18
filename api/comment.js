@@ -1,12 +1,12 @@
 var express = require('express');
-const CommentRouter = require('express').Router();
+const commentRouter = require('express').Router();
 var pool = require('../utils/dbCon');
 
-CommentRouter.get('/get', function(req, res) 
+commentRouter.post('/get', function(req, res) 
 {
     let retCode = 200;
     let message = "";
-    const { eventID } = req.body;
+    const { eventid } = req.body;
 
     try {
         pool.getConnection(function(err, con) {
@@ -16,7 +16,7 @@ CommentRouter.get('/get', function(req, res)
             }
             con.query({
                     sql: "SELECT * FROM Comments WHERE EventID = ?",
-                    values: [eventID]
+                    values: [eventid]
                 },
                 function(err, results) {
                     if (err) {
@@ -41,7 +41,7 @@ CommentRouter.get('/get', function(req, res)
 });
 
 
-CommentRouter.post('/delete', function(req, res) 
+commentRouter.post('/delete', function(req, res) 
 {
     let retCode = 200;
     let message = "";
@@ -79,12 +79,13 @@ CommentRouter.post('/delete', function(req, res)
     }
 });
 
-CommentRouter.post('/comment', function(req,res)
+commentRouter.post('/comment', function(req,res)
 {
     console.log("hello");
     let retCode = 200;
     let message = "";
-    const{eventID, uid, time, comment} = req.body;
+    var datetime = new Date();
+    const{eventID, uid, comment} = req.body;
 
     try
     {
@@ -95,7 +96,7 @@ CommentRouter.post('/comment', function(req,res)
                     con.release();
                 throw err;
             }
-        con.query({sql: "INSERT IGNORE INTO Comments SET ?", values: {EventID: eventID,UID: uid,Time: time,Comment: comment}},
+        con.query({sql: "INSERT IGNORE INTO Comments SET ?", values: {EventID: eventID,UID: uid,Time: datetime,Comment: comment}},
             function (err,results) {
                 if (err)
                 {
@@ -128,7 +129,7 @@ CommentRouter.post('/comment', function(req,res)
 	}
 });
 
-CommentRouter.post('/edit', function(req, res) {
+commentRouter.post('/edit', function(req, res) {
     console.log("Editing comment");
     let retCode = 200;
     let message = "";
@@ -169,4 +170,4 @@ CommentRouter.post('/edit', function(req, res) {
     }
 });
 
-module.exports = CommentRouter;
+module.exports = commentRouter;

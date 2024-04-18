@@ -1,14 +1,16 @@
 import React from 'react';
+import {useSearchParams} from 'react-router-dom';
 import Cookies from 'universal-cookie';
 var url = require('url');
 const route = require('./route.js');
 const fakeEventCount = 20;
-const faking = true;
+const faking = false;
 
 const RSOViewBody = () => {
-    var rsoid;
+    var eventid;
     const [message, setMessage] = React.useState('');
-    const [result, setResult] = React.useState({});
+    const [event, setEvent] = React.useState({});
+    const [searchParams, setSearchParams] = useSearchParams();
     const [comments, setComments] = React.useState([]);
 
     const fillData = (contents) =>
@@ -21,7 +23,7 @@ const RSOViewBody = () => {
                 Time: formatDate(new Date())
             }
 
-            setResult(fakeRSO);
+            setEvent(fakeRSO);
 
             var fakeComments = [];
 
@@ -48,7 +50,55 @@ const RSOViewBody = () => {
 
     const redirectEvent = (EventID) =>
     {
-        window.location = "/viewevent?eventid=" + EventID;
+        window.location = "/event/view?eventid=" + EventID;
+    }
+
+    const getComments = async event =>
+    {
+        eventid = searchParams.get("eventid");
+        var object = { eventid };
+		var input = JSON.stringify(object);
+
+        const response = await fetch(route.buildRoute('/api/comment/get'), {
+            method:'post',
+            body: input,
+            headers: {'Content-Type': 'application/json'}
+        });
+
+        var ret = JSON.parse(await response.text());
+
+        setComments(ret.comments);
+    }
+
+    const getEvent = async event =>
+    {
+        eventid = searchParams.get("eventid");;
+        var object = { eventid };
+		var input = JSON.stringify(object);
+
+        try
+        {
+            const response = await fetch(route.buildRoute('/api/event/get'), {
+                method:'post',
+                body: input,
+                headers: {'Content-Type': 'application/json'}
+            });
+
+            var ret = JSON.parse(await response.text());
+
+            if (ret.result)
+            {
+                setEvent(ret.result[0]);
+
+                getComments();
+            }
+        }
+        catch(e)
+        {
+            alert(e.toString());
+            
+            return false;
+        }
     }
 
     React.useEffect(() => {
@@ -56,15 +106,19 @@ const RSOViewBody = () => {
             if (faking)
             {
                 fillData(null);
+
+                return;
             }
+
+            getEvent();
         };
 	},[]);
 
     return (
         <div class = "trueBody">
             <div id="profile">
-                <h1 class="title">{result.Name}</h1><a id="member"> - <bold>{result.Time}</bold></a><br/>
-                <p class="mainDesc">{result.Description}</p>
+                <h1 class="title">{event.Name}</h1><a id="member"> - <bold>{event.Time}</bold></a><br/>
+                <p class="mainDesc">{event.Description}</p>
             </div>
             <b id="activity"></b>
             <h2 id="lessPadding">Comments</h2>
@@ -73,7 +127,7 @@ const RSOViewBody = () => {
                 comments.map((comment) => (
                     <div id="searchResult">
                         <div id="name">
-                            {comment.Name}
+                            {comment.UID}
                         </div>
                         <div id="shellDesc">
                             <div id="desc">

@@ -379,5 +379,48 @@ EventRouter.post('/searchseeable', function(req, res)
     }
 });
 
+EventRouter.post('/get', function(req, res) 
+{
+    let retCode = 200;
+    let message = "";
+
+    const { eventid } = req.body;
+
+    console.log("Starting GET for event " + eventid);
+
+    try {
+        pool.getConnection(function(err, con) {
+            if (err) {
+                if (con)
+                    con.release();
+                throw err;
+            }
+
+            const sqlQuery = "SELECT * FROM events WHERE EventID = ?";
+            const searchTerm = [eventid]; 
+
+            con.query({
+                sql: sqlQuery,
+                values: searchTerm
+            }, function(err, result) {
+                if (err) {
+                    if (con)
+                        con.release();
+                    throw err;
+                }
+
+                con.release();
+                
+                var ret = {result, message};
+
+                res.status(retCode).json(ret);
+            });
+        });
+    } catch (e) {
+        retCode = 404;
+        var ret = { error: e.message };
+        res.status(retCode).json(ret);
+    }
+});
 
 module.exports = EventRouter;

@@ -167,7 +167,7 @@ const RSOViewBody = () => {
 
     const redirectEvent = (EventID) =>
     {
-        window.location = "/viewevent?eventid=" + EventID;
+        window.location = "/event/view?eventid=" + EventID;
     }
 
     React.useEffect(() => {
