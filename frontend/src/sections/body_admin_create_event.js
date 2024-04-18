@@ -1,4 +1,5 @@
 import React from 'react';
+import { useSearchParams } from 'react-router-dom';
 import Cookies from 'universal-cookie';
 import DateTimePicker from 'react-datetime-picker';
 const route = require('./route.js');
@@ -7,9 +8,11 @@ const CreateEvent = () => {
     var name;
     var description;
     var location;
+    var eventid = -1;
 
     const [message, setMessage] = React.useState('');
     const [value, onChange] = React.useState(new Date());
+    const [searchParams, setSearchParams] = useSearchParams();
     
     const redirectHome = () => {
 		window.location.href = "/home";
@@ -50,22 +53,49 @@ const CreateEvent = () => {
         }
 	}
 
+    const tryCreateRSOEvent = async event =>
+    {
+        const cookies = new Cookies();
+        var uid = cookies.get('login');
+        var object = {eventid:eventid, rsoid:searchParams.get("rsoid"), uid};
+        var input = JSON.stringify(object);
+
+        
+
+        try
+        {
+            const response = await fetch(route.buildRoute('/api/event/rsocreate'), {
+                method:'post',
+                body: input,
+                headers: {'Content-Type': 'application/json'}
+            });
+
+            var ret = JSON.parse(await response.text());
+
+            // incase we decide to make message non-emp
+            setMessage(ret.message);
+        }
+        catch(e)
+        {
+            alert(e.toString());
+            
+            return;
+        }
+    }
+
     const tryCreateEvent = async event =>
     {
         event.preventDefault();
-        const cookies = new Cookies();
-        var uid = cookies.get('login');
-
-        if (!name.value)
+        if (!name.value || name.value.length > 29)
         {
-            setMessage("The name can't be empty!");
+            setMessage("Error with name value");
 
             return;
         }
 
-        if (name.value.length > 29)
+        if (!location.value || location.value.length > 29)
         {
-            setMessage("Name is too long!");
+            setMessage("Error with location value");
 
             return;
         }
@@ -77,7 +107,10 @@ const CreateEvent = () => {
             return;
         }
 
-        var object = {name:name.value, description:description.value, locationname:location.value, time: formatDate(value), uid, isPrivate: false};
+        var time = formatDate(value);
+        const cookies = new Cookies();
+        var uid = cookies.get('login');
+        var object = {name:name.value, description:description.value, locationname:location.value, time, uid, isPrivate: false};
         var input = JSON.stringify(object);
 
         try
@@ -91,17 +124,24 @@ const CreateEvent = () => {
             var ret = JSON.parse(await response.text());
 
             // incase we decide to make message non-emp
-            setMessage(ret.message);
+            // setMessage(ret.message);
 
-            if (ret.rsoid === undefined)
+            if (ret.eventid === undefined)
             {
                 return false;
             }
             else
             {
-                setMessage("RSO Created! Redirecting...");
+                var rsoid = searchParams.get("rsoid");
+                if (rsoid != null)
+                {
+                    eventid = ret.eventid;
+                    tryCreateRSOEvent();
+                }
 
-                window.location.href = '/admin/managerso?rsoid=' + ret.rsoid;
+                // setMessage("Event Created! Redirecting...");
+
+                // window.location.href = '/event/view?eventid=' + ret.eventid;
             }
         }
         catch(e)

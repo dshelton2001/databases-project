@@ -14,6 +14,8 @@ EventRouter.post('/create', function(req, res) {
                 if (con) con.release();
                 throw err;
             }
+
+            console.log("Begin CREATE for Event " + name);
             
             con.query({
                 sql: "INSERT INTO Events (LocationName, Name, Time, Description) VALUES (?, ?, ?, ?)",
@@ -50,7 +52,7 @@ EventRouter.post('/create', function(req, res) {
                                 }
                                 if (eventsResult && eventsResult.affectedRows > 0) {
                                     // Success
-                                    res.status(retCode).json({ message });
+                                    res.status(retCode).json({eventid: results.insertId, message });
                                 } else {
                                     // Failed to insert into the respective events table
                                     retCode = 500;
@@ -83,9 +85,11 @@ EventRouter.post('/create', function(req, res) {
 
 
 EventRouter.post('/RSOcreate', function(req, res) {
-    const { eventID, rsoID, uid } = req.body;
+    const { eventid, rsoid, uid } = req.body;
     let retCode = 200;
     let message = "";
+
+    console.log("Begin RSOCREATE for EventID " + eventid);
 
     try {
         pool.getConnection(function(err, con) {
@@ -98,7 +102,7 @@ EventRouter.post('/RSOcreate', function(req, res) {
             // Retrieve the event time from the Events table
             con.query({
                 sql: "SELECT Time FROM Events WHERE EventID = ?",
-                values: [eventID]
+                values: [eventid]
             }, function(err, eventResult) {
                 if (err) {
                     if (con)
@@ -111,7 +115,7 @@ EventRouter.post('/RSOcreate', function(req, res) {
                 // Check if the user is an admin of the specified RSO
                 con.query({
                     sql: "SELECT 1 FROM RSOCreationHistory WHERE RSOID = ? AND UID = ?",
-                    values: [rsoID, uid]
+                    values: [rsoid, uid]
                 }, function(err, adminResult) {
                     if (err) {
                         if (con)
@@ -128,7 +132,7 @@ EventRouter.post('/RSOcreate', function(req, res) {
                     // Check if there is an event with the same time in the RSO
                     con.query({
                         sql: "SELECT * FROM RSOEvents WHERE RSOID = ?",
-                        values: [rsoID]
+                        values: [rsoid]
                     }, function(err, rsoEventsResult) {
                         if (err) {
                             if (con)
@@ -138,7 +142,7 @@ EventRouter.post('/RSOcreate', function(req, res) {
 
                         // If there are events in the RSO, check for time overlap
                         if (rsoEventsResult.length > 0) {
-                            const rsoEventIDs = rsoEventsResult.map(row => row.EventID);
+                            const rsoEventIDs = rsoEventsResult.map(row => row.Eventid);
                             console.log("in here");
                             con.query({
                                 sql: "SELECT * FROM events WHERE EXISTS (SELECT 1 FROM rsoevents WHERE events.EventID = rsoevents.EventID AND rsoevents.RSOID = ?) AND Time = ?",
@@ -159,7 +163,7 @@ EventRouter.post('/RSOcreate', function(req, res) {
                                 // Insert the event into RSOEvents table
                                 con.query({
                                     sql: "INSERT INTO RSOEvents (EventID, RSOID) VALUES (?, ?)",
-                                    values: [eventID, rsoID]
+                                    values: [eventid, rsoid]
                                 }, function(err, insertResult) {
                                     if (err) {
                                         if (con)
@@ -182,7 +186,7 @@ EventRouter.post('/RSOcreate', function(req, res) {
                             // Insert the event into RSOEvents table since there are no events in the RSO
                             con.query({
                                 sql: "INSERT INTO RSOEvents (EventID, RSOID) VALUES (?, ?)",
-                                values: [eventID, rsoID]
+                                values: [eventid, rsoid]
                             }, function(err, insertResult) {
                                 if (err) {
                                     if (con)
@@ -211,8 +215,6 @@ EventRouter.post('/RSOcreate', function(req, res) {
         res.status(retCode).json({ message });
     }
 });
-
-
 
 
 EventRouter.post('/search', function(req, res) 
