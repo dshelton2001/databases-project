@@ -8,8 +8,12 @@ const AdminBody = () => {
 		window.location.href = "/home";
 	}
 
-    const redirectCreate = () => {
-		window.location.href = "/admin/create";
+    const redirectCreateRSO = () => {
+		window.location.href = "/admin/createrso";
+	}
+
+    const redirectCreateEvent = () => {
+		window.location.href = "/admin/createevent";
 	}
 
     const redirectManage = () => {
@@ -58,7 +62,8 @@ const AdminBody = () => {
             <div class="menuText">Manage Menu</div>
 
             <div class="adminOption">< button onClick={redirectManage} class="optionButton">Managed RSO's</button></div>
-            <div class="adminOption"><button onClick={redirectCreate} class="optionButton">Create RSO</button></div>
+            <div class="adminOption"><button onClick={redirectCreateRSO} class="optionButton">Create RSO</button></div>
+            <div class="adminOption"><button onClick={redirectCreateEvent} class="optionButton">Create Public Event</button></div>
         </div>
     )
 }

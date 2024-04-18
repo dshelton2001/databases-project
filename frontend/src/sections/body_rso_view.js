@@ -104,6 +104,31 @@ const RSOViewBody = () => {
         }
     }
 
+    const joinRSO = async event =>
+    {
+        const cookies = new Cookies();
+		var cookie = cookies.get('login');
+
+		var object = { uid: cookie, rsoid: searchParams.get("rsoid") };
+		var input = JSON.stringify(object);
+        try
+        {
+            const response = await fetch(route.buildRoute('/api/rso/join'), {
+                method:'post',
+                body: input,
+                headers: {'Content-Type': 'application/json'}
+            });
+
+            var ret = JSON.parse(await response.text());
+        }
+        catch(e)
+        {
+            alert(e.toString());
+            
+            return false;
+        }
+    }
+
     const getRSO = async event =>
     {
         var object = { rsoid };
@@ -168,7 +193,9 @@ const RSOViewBody = () => {
     return (
         <div class = "trueBody">
             <div id="profile">
-                <h1 class="title">{RSO.Name}</h1><div id="member">Members: <bold>{memberInfo.memberCount}</bold></div>
+                <h1 class="title">{RSO.Name}</h1>
+                <div class="center"><button id="submit" onClick={joinRSO}>Join</button></div>
+                <div id="member">Members: <bold>{memberInfo.memberCount}</bold></div>
                 <div id="activity">{memberInfo.isActive? "" : "Not active"}</div>
                 <h2 class="descTitle">Description</h2>
                 <p class="mainDesc">{RSO.Description}</p>

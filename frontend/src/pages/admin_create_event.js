@@ -1,10 +1,10 @@
 import React from 'react';
 
 import AccountHeader from '../sections/header_account';
-import AdminCreateBody from '../sections/body_admin_create';
+import AdminCreateBody from '../sections/body_admin_create_event';
 import DefaultFooter from '../sections/footer_default';
 
-const AdminCreate = () => {
+const AdminCreateEvent = () => {
     return (
         <div>
             <AccountHeader />
@@ -14,4 +14,4 @@ const AdminCreate = () => {
     )
 }
 
-export default AdminCreate;
+export default AdminCreateEvent;

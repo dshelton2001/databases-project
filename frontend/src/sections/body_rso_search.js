@@ -45,7 +45,8 @@ const RSOSearch = () => {
 
     const trySearch = async event =>
     {
-        event.preventDefault();
+        if (event)
+            event.preventDefault();
 
         var object = {search:search.value};
         var input = JSON.stringify(object);
@@ -105,6 +106,10 @@ const RSOSearch = () => {
     {
         window.location = "/rso/view?rsoid=" + RSOID;
     }
+
+    React.useEffect(() => {
+        trySearch();
+	},[]);
 
     return (
         <div class = "trueBody">

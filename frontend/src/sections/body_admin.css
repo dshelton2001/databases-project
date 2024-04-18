@@ -71,6 +71,15 @@
     margin-bottom: 8px;
 }
 
+.createRSO #calendar {
+    display: inline-table;
+    width: calc(100% / 3);
+    font-size: 24px;
+
+    border-radius: 8px;
+    margin-bottom: 8px;
+}
+
 .createRSO textArea {
     width: calc(100% / 3);
     height: 200px;

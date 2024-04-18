@@ -14,7 +14,8 @@ import EventView from './pages/event_view';
 import EventSearch from './pages/event_search';
 
 import Admin from './pages/admin';
-import AdminCreate from './pages/admin_create';
+import AdminCreateRSO from './pages/admin_create_rso';
+import AdminCreateEvent from './pages/admin_create_event';
 import AdminManage from './pages/admin_manage';
 import AdminRSOEdit from './pages/admin_rso_edit';
 
@@ -36,7 +37,8 @@ function App ()
 				<Route path="/event" element={<EventSearch />} />
 
 				<Route path="/admin" element={<Admin />} />
-				<Route path="/admin/create" element={<AdminCreate />} />
+				<Route path="/admin/createrso" element={<AdminCreateRSO />} />
+				<Route path="/admin/createevent" element={<AdminCreateEvent />} />
 				<Route path="/admin/manage" element={<AdminManage />} />
 				<Route path="/admin/managerso" element={<AdminRSOEdit />} />
 			</Routes>

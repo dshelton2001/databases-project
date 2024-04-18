@@ -1,12 +1,15 @@
 import React from 'react';
 import Cookies from 'universal-cookie';
+import DateTimePicker from 'react-datetime-picker';
 const route = require('./route.js');
 
-const RSOFeed = () => {
+const CreateEvent = () => {
     var name;
     var description;
+    var location;
 
     const [message, setMessage] = React.useState('');
+    const [value, onChange] = React.useState(new Date());
     
     const redirectHome = () => {
 		window.location.href = "/home";
@@ -47,7 +50,7 @@ const RSOFeed = () => {
         }
 	}
 
-    const tryCreateRSO = async event =>
+    const tryCreateEvent = async event =>
     {
         event.preventDefault();
         const cookies = new Cookies();
@@ -74,12 +77,12 @@ const RSOFeed = () => {
             return;
         }
 
-        var object = {name:name.value, description:description.value, uid};
+        var object = {name:name.value, description:description.value, locationname:location.value, time: formatDate(value), uid, isPrivate: false};
         var input = JSON.stringify(object);
 
         try
         {
-            const response = await fetch(route.buildRoute('/api/rso/create'), {
+            const response = await fetch(route.buildRoute('/api/event/create'), {
                 method:'post',
                 body: input,
                 headers: {'Content-Type': 'application/json'}
@@ -109,6 +112,11 @@ const RSOFeed = () => {
         }
     }
 
+    const formatDate = (date) =>
+    {
+        return date.toISOString().replace(/T/, ' ').replace(/\..+/, '');
+    }
+
     React.useEffect(() => {
 		return () => {
 			checkForAdmin();
@@ -120,10 +128,11 @@ const RSOFeed = () => {
             <div class="menuText">Create an RSO</div>
             <div class="adminBack">< button onClick={redirectAdmin} class="adminBackButton">Back</button></div>
             <br/>
-            <form class="createRSO" onSubmit={tryCreateRSO}>
+            <form class="createRSO" onSubmit={tryCreateEvent}>
                 <div id="label"><label id="labelName">Name </label></div><input ref={(c) => name = c}/><br/>
                 <div id="label"><label id="labelDesc">Description </label></div><textArea ref={(c) => description = c}/><br/>
-
+                <div id="label"><label id="labelName">Location </label></div><input ref={(c) => location = c}/><br/>
+                <div id="label"><label id="labelName">Date/Time </label></div><div id="calendar"><DateTimePicker onChange={onChange} value={value} /><br/></div>
                 <span class="result" id="result">{message}</span><br/>
                 <div class="center"><button id="submit">Create</button></div>
             </form>
@@ -131,4 +140,4 @@ const RSOFeed = () => {
     )
 }
 
-export default RSOFeed;
+export default CreateEvent;

@@ -45,13 +45,15 @@ const RSOSearch = () => {
 
     const trySearch = async event =>
     {
+        var object
         if (event)
             event.preventDefault();
 
         const cookies = new Cookies();
 		var cookie = cookies.get('login');
 
-        var object = {uid:cookie, search: search.value};
+        object = {uid:cookie, search: search.value};
+        
         var input = JSON.stringify(object);
 
         if (faking)
@@ -110,6 +112,10 @@ const RSOSearch = () => {
     {
         window.location = "/event/view?eventid=" + EVENTID;
     }
+
+    React.useEffect(() => {
+        trySearch();
+	},[]);
 
     return (
         <div class = "trueBody">

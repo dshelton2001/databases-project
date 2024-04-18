@@ -5,7 +5,7 @@ var pool = require('../utils/dbCon');
 EventRouter.post('/create', function(req, res) {
     let retCode = 200;
     let message = "";
-    const { locationname, Name, time, description, uid, isPrivate } = req.body;
+    const { locationname, name, time, description, uid, isPrivate } = req.body;
 
     try {
         // Start by contacting the pool
@@ -17,7 +17,7 @@ EventRouter.post('/create', function(req, res) {
             
             con.query({
                 sql: "INSERT INTO Events (LocationName, Name, Time, Description) VALUES (?, ?, ?, ?)",
-                values: [locationname, Name, time, description]
+                values: [locationname, name, time, description]
             }, function(err, results) {
                 if (err) {
                     if (con) con.release();
@@ -127,7 +127,7 @@ EventRouter.post('/RSOcreate', function(req, res) {
 
                     // Check if there is an event with the same time in the RSO
                     con.query({
-                        sql: "SELECT 1 FROM RSOEvents WHERE RSOID = ?",
+                        sql: "SELECT * FROM RSOEvents WHERE RSOID = ?",
                         values: [rsoID]
                     }, function(err, rsoEventsResult) {
                         if (err) {

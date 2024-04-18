@@ -263,6 +263,8 @@ RsoRouter.post('/join', function(req,res)
 
     const {uid, rsoid} = req.body;
 
+    console.log("Begin JOIN for UID " + uid + " & RSOID " + rsoid);
+
     try
 	{	
 		// start by contacting the pool
@@ -276,7 +278,7 @@ RsoRouter.post('/join', function(req,res)
 			}
             
             con.query({
-                sql: "INSERT INTO rsomembers SET ?",
+                sql: "INSERT IGNORE INTO rsomembers SET ?",
                 values: {UID: uid, RSOID: rsoid}
             }, function (err, results) {
                 if(err)
