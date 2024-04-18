@@ -35,6 +35,7 @@ CREATE TABLE `database-project`.Events
 	Name VARCHAR(30),
 	LocationName VARCHAR(30),
 	Description VARCHAR(300),
+	Time DATETIME,
 	PRIMARY KEY (EventID),
 	FOREIGN KEY (LocationName) REFERENCES Location(Name)
 );
@@ -102,4 +103,20 @@ CREATE TABLE `database-project`.EventCreationHistory
 	TimeCreated DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	FOREIGN KEY (EventID) REFERENCES Events(EventID),
 	FOREIGN KEY (UID) REFERENCES Admins(UID)
+);
+
+CREATE TABLE `database-project`.University
+(
+	UniversityID INT NOT NULL AUTO_INCREMENT,
+	Name VARCHAR(30) NOT NULL,
+	Description VARCHAR(300),
+	PRIMARY KEY (UniversityID)
+);
+
+CREATE TABLE `database-project`.UniversityMembers
+(
+	UniversityID INT NOT NULL;
+	UID INT NOT NULL;
+	FOREIGN KEY (UID) REFERENCES Users(UID);
+	FOREIGN KEY (UniversityID) REFERENCES University();
 );

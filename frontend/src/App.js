@@ -16,6 +16,7 @@ import EventSearch from './pages/event_search';
 import Admin from './pages/admin';
 import AdminCreate from './pages/admin_create';
 import AdminManage from './pages/admin_manage';
+import AdminRSOEdit from './pages/admin_rso_edit';
 
 function App ()
 {
@@ -37,6 +38,7 @@ function App ()
 				<Route path="/admin" element={<Admin />} />
 				<Route path="/admin/create" element={<AdminCreate />} />
 				<Route path="/admin/manage" element={<AdminManage />} />
+				<Route path="/admin/managerso" element={<AdminRSOEdit />} />
 			</Routes>
 		</BrowserRouter>
 	);

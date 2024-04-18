@@ -1,4 +1,5 @@
 import React from 'react';
+import {useSearchParams} from 'react-router-dom';
 import Cookies from 'universal-cookie';
 import './body_rso_view.css';
 var url = require('url');
@@ -9,8 +10,10 @@ const faking = false;
 const RSOViewBody = () => {
     var rsoid;
     const [message, setMessage] = React.useState('');
-    const [result, setResult] = React.useState({});
+    const [RSO, setRSO] = React.useState({});
     const [events, setEvents] = React.useState([]);
+    const [searchParams, setSearchParams] = useSearchParams();
+    const [memberInfo, setMemberInfo] = React.useState({});
 
     const fillData = (contents) =>
     {
@@ -24,7 +27,13 @@ const RSOViewBody = () => {
                 active: memberCount > 4? true : false
             };
 
-            setResult(fakeRSO);
+            var fakeMemberInfo = {
+                memberCount: 5,
+                isActive: true
+            };
+
+            setRSO(fakeRSO);
+            setMemberInfo(fakeMemberInfo);
 
             var fakeEvents = [];
 
@@ -45,6 +54,87 @@ const RSOViewBody = () => {
         }
     }
 
+    const getEvents = async event =>
+    {
+        var object = { rsoid };
+		var input = JSON.stringify(object);
+
+        try
+        {
+            const response = await fetch(route.buildRoute('/api/event/rsosearch'), {
+                method:'post',
+                body: input,
+                headers: {'Content-Type': 'application/json'}
+            });
+
+            var ret = JSON.parse(await response.text());
+            
+            setEvents(ret.results);
+        }
+        catch(e)
+        {
+            alert(e.toString());
+            
+            return false;
+        }
+    }
+
+    const getMemberInfo = async event =>
+    {
+        var object = { rsoid };
+		var input = JSON.stringify(object);
+
+        try
+        {
+            const response = await fetch(route.buildRoute('/api/rso/RSOCount'), {
+                method:'post',
+                body: input,
+                headers: {'Content-Type': 'application/json'}
+            });
+
+            var ret = JSON.parse(await response.text());
+
+            setMemberInfo(ret);
+        }
+        catch(e)
+        {
+            alert(e.toString());
+            
+            return false;
+        }
+    }
+
+    const getRSO = async event =>
+    {
+        var object = { rsoid };
+		var input = JSON.stringify(object);
+
+        try
+        {
+            const response = await fetch(route.buildRoute('/api/rso/getfromid'), {
+                method:'post',
+                body: input,
+                headers: {'Content-Type': 'application/json'}
+            });
+
+            var ret = JSON.parse(await response.text());
+
+            if (!ret.result)
+                setRSO({Name: "RSO does not exist."})
+            else
+                setRSO(ret.result);
+
+            getEvents();
+            getMemberInfo();
+        }
+        catch(e)
+        {
+            alert(e.toString());
+            
+            return false;
+        }
+    }
+
     const formatDate = (date) =>
     {
         return date.toISOString().replace(/T/, ' ').replace(/\..+/, '');
@@ -57,20 +147,31 @@ const RSOViewBody = () => {
 
     React.useEffect(() => {
         return () => {
+            rsoid = searchParams.get("rsoid");
+
             if (faking)
             {
                 fillData(null);
             }
+
+            if (!rsoid)
+            {
+                setRSO({Name: "An RSOID is required."});
+
+                return;
+            }
+
+            getRSO();
         };
 	},[]);
 
     return (
         <div class = "trueBody">
             <div id="profile">
-                <h1 class="title">{result.Name}</h1><div id="member">Members: <bold>{result.memberCount}</bold></div>
-                <div id="activity">{result.active? "" : "Not active"}</div>
+                <h1 class="title">{RSO.Name}</h1><div id="member">Members: <bold>{memberInfo.memberCount}</bold></div>
+                <div id="activity">{memberInfo.isActive? "" : "Not active"}</div>
                 <h2 class="descTitle">Description</h2>
-                <p class="mainDesc">{result.Description}</p>
+                <p class="mainDesc">{RSO.Description}</p>
             </div>
             
             <h2 id="lessPadding">Events</h2>

@@ -44,37 +44,6 @@ const DefaultHeader = () => {
 		return false;
 	}
 
-	const checkForAdmin = async event =>
-	{
-		const cookies = new Cookies();
-		var cookie = cookies.get('login');
-
-		var object = { uid: cookie };
-		var input = JSON.stringify(object);
-
-		try
-        {
-            const response = await fetch(route.buildRoute('/api/users/checkadmin'), {
-                method:'post',
-                body: input,
-                headers: {'Content-Type': 'application/json'}
-            });
-
-            var ret = JSON.parse(await response.text());
-
-			if (!ret.isAdmin)
-			{
-				return <p>Wowie</p>
-			}
-        }
-        catch(e)
-        {
-            alert(e.toString());
-            
-            return;
-        }
-	}
-
 	// React.useEffect() makes it run once the webpage loads
 	// This way, we cannot avoid loading user information
 	React.useEffect(() => {
@@ -83,8 +52,6 @@ const DefaultHeader = () => {
 			{
 				redirectLogout();
 			}
-
-			checkForAdmin();
 		};
 	},[]);
 

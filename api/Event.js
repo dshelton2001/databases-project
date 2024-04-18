@@ -83,10 +83,9 @@ EventRouter.post('/create', function(req, res) {
 
 
 EventRouter.post('/RSOcreate', function(req, res) {
+    const { eventID, rsoID, uid } = req.body;
     let retCode = 200;
     let message = "";
-
-    const { eventID, rsoID, uid } = req.body;
 
     try {
         pool.getConnection(function(err, con) {
@@ -95,6 +94,8 @@ EventRouter.post('/RSOcreate', function(req, res) {
                     con.release();
                 throw err;
             }
+
+            // Retrieve the event time from the Events table
             con.query({
                 sql: "SELECT Time FROM Events WHERE EventID = ?",
                 values: [eventID]
@@ -104,61 +105,92 @@ EventRouter.post('/RSOcreate', function(req, res) {
                         con.release();
                     throw err;
                 }
-                var eventTime = eventResult[0].Time;
-                // Check if the user is the admin of the specified RSO
+
+                const eventTime = eventResult[0].Time;
+
+                // Check if the user is an admin of the specified RSO
                 con.query({
-                    sql: "SELECT * FROM RSOCreationHistory WHERE RSOID = ? AND UID = ?",
+                    sql: "SELECT 1 FROM RSOCreationHistory WHERE RSOID = ? AND UID = ?",
                     values: [rsoID, uid]
-                }, function(err, results) {
+                }, function(err, adminResult) {
                     if (err) {
                         if (con)
                             con.release();
                         throw err;
                     }
 
-                    if (results.length === 0) {
-                        retCode = 403; 
+                    if (adminResult.length === 0) {
+                        retCode = 403;
                         message = "You are not authorized to create an event for this RSO.";
-                        const ret = { message };
-                        return res.status(retCode).json(ret);
+                        return res.status(retCode).json({ message });
                     }
 
-                    // Retrieve events associated with the same RSO
+                    // Check if there is an event with the same time in the RSO
                     con.query({
-                        sql: "SELECT E.EventID, E.Name, E.LocationName, E.Description, E.Time " +
-                            "FROM Events AS E INNER JOIN RSOEvents AS R ON E.EventID = R.EventID " +
-                            "WHERE R.RSOID = ? AND E.Time = ?",
-                        values: [rsoID, eventTime]
-                    }, function(err, results) {
+                        sql: "SELECT 1 FROM RSOEvents WHERE RSOID = ?",
+                        values: [rsoID]
+                    }, function(err, rsoEventsResult) {
                         if (err) {
                             if (con)
                                 con.release();
                             throw err;
                         }
 
-                        // Check for overlapping event times
-                        const overlappingEvent = results.find(event => {
-                            const eventTime2 = (event.Time);
-                            return eventTime === eventTime2;
-                        });
-
-                        if (overlappingEvent) {
-                            retCode = 409;
-                            message = "An event in the same RSO is already scheduled at this time.";
-                            const ret = { message };
-                            res.status(retCode).json(ret);
-                        } else {
+                        // If there are events in the RSO, check for time overlap
+                        if (rsoEventsResult.length > 0) {
+                            const rsoEventIDs = rsoEventsResult.map(row => row.EventID);
+                            console.log("in here");
                             con.query({
-                                sql: "INSERT INTO RSOEvents (EventID, RSOID) VALUES (?, ?)",
-                                values: [eventID, rsoID]
-                            }, function(err, results) {
+                                sql: "SELECT * FROM events WHERE EXISTS (SELECT 1 FROM rsoevents WHERE events.EventID = rsoevents.EventID AND rsoevents.RSOID = ?) AND Time = ?",
+                                values: [rsoEventIDs, eventTime]
+                            }, function(err, overlapResult) {
                                 if (err) {
                                     if (con)
                                         con.release();
                                     throw err;
                                 }
 
-                                if (results && results.affectedRows > 0) {
+                                if (overlapResult.length > 0) {
+                                    retCode = 409;
+                                    message = "An event in the same RSO is already scheduled at this time.";
+                                    return res.status(retCode).json({ message });
+                                }
+
+                                // Insert the event into RSOEvents table
+                                con.query({
+                                    sql: "INSERT INTO RSOEvents (EventID, RSOID) VALUES (?, ?)",
+                                    values: [eventID, rsoID]
+                                }, function(err, insertResult) {
+                                    if (err) {
+                                        if (con)
+                                            con.release();
+                                        throw err;
+                                    }
+
+                                    if (insertResult && insertResult.affectedRows > 0) {
+                                        retCode = 201;
+                                        message = "RSO event created successfully.";
+                                    } else {
+                                        retCode = 409;
+                                        message = "Failed to create RSO event.";
+                                    }
+
+                                    res.status(retCode).json({ message });
+                                });
+                            });
+                        } else {
+                            // Insert the event into RSOEvents table since there are no events in the RSO
+                            con.query({
+                                sql: "INSERT INTO RSOEvents (EventID, RSOID) VALUES (?, ?)",
+                                values: [eventID, rsoID]
+                            }, function(err, insertResult) {
+                                if (err) {
+                                    if (con)
+                                        con.release();
+                                    throw err;
+                                }
+
+                                if (insertResult && insertResult.affectedRows > 0) {
                                     retCode = 201;
                                     message = "RSO event created successfully.";
                                 } else {
@@ -166,8 +198,7 @@ EventRouter.post('/RSOcreate', function(req, res) {
                                     message = "Failed to create RSO event.";
                                 }
 
-                                const ret = { message };
-                                res.status(retCode).json(ret);
+                                res.status(retCode).json({ message });
                             });
                         }
                     });
@@ -175,11 +206,13 @@ EventRouter.post('/RSOcreate', function(req, res) {
             });
         });
     } catch (e) {
-        retCode = 404;
-        const ret = { error: e.message };
-        res.status(retCode).json(ret);
+        retCode = 500;
+        message = "Internal Server Error";
+        res.status(retCode).json({ message });
     }
 });
+
+
 
 
 EventRouter.post('/search', function(req, res) 
@@ -225,11 +258,11 @@ EventRouter.post('/search', function(req, res)
 });
 
 // we'll need to make a fork of this that pulls from all rsos the user is a part of
-EventRouter.get('/RSOsearch', function(req, res) 
+EventRouter.post('/RSOsearch', function(req, res) 
 {
     let retCode = 200;
     let message = "";
-    const { RSOID } = req.body;
+    const { rsoid } = req.body;
 
     try {
         pool.getConnection(function(err, con) {
@@ -238,8 +271,8 @@ EventRouter.get('/RSOsearch', function(req, res)
                 throw err;
             }
             con.query({
-                    sql: "SELECT * FROM RSOEvents WHERE RSOID = ?",
-                    values: [RSOID]
+                    sql: "SELECT * FROM events WHERE EXISTS (SELECT 1 FROM RSOEvents WHERE events.EventID = rsoevents.EventID AND RSOID = ?)",
+                    values: [rsoid]
                 },
                 function(err, results) {
                     if (err) {
@@ -253,6 +286,7 @@ EventRouter.get('/RSOsearch', function(req, res)
                         retCode = 404;
                         message = "No RSO events found for the specified RSOID.";
                     }
+
                     res.status(retCode).json({ message, results });
                 }
             );

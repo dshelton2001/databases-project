@@ -203,6 +203,59 @@ RsoRouter.post('/search', function(req,res)
     }
 });
 
+RsoRouter.post('/getfromid', function(req,res)
+{
+    let retCode = 200;
+    let message = "base message.";
+
+    const {rsoid} = req.body;
+
+    console.log("Begin GETFROMID for RSOID " + rsoid);
+
+    try
+	{	
+		// start by contacting the pool
+		pool.getConnection(function(err, con) 
+        {
+			if (err)
+			{
+				if (con)
+					con.release();
+				throw err;
+			}
+            
+            con.query({
+                sql: "SELECT * FROM rsos WHERE RSOID = ?",
+                values: [rsoid]},
+            function (err, results) {
+                if(err)
+                    throw err;
+                con.release();
+                
+                if(results[0])
+                {
+                    message = "Results exists! Wow!";
+                    var ret = {result: results[0], message};
+                }
+                else
+                {
+                    retCode = 209;
+                    message = "RSO does not exist.";
+                    var ret = {results, message};
+                }
+                res.status(retCode).json(ret);
+            })
+        });
+
+    }
+    catch(e)
+    {
+		retCode = 404;
+		var ret = {error: e.message};
+		res.status(retCode).json(ret);
+    }
+});
+
 RsoRouter.post('/join', function(req,res)
 {
     let retCode = 200;
@@ -318,10 +371,10 @@ RsoRouter.post('/edit', function(req, res) {
                 con.release();
                 
                 if (result.affectedRows > 0) {
-                    message = "edit work.";
+                    message = "edit successful.";
                 } else {
                     retCode = 400;
-                    message = "edit no work.";
+                    message = "edit not successful.";
                 }
                 res.status(retCode).json({ message });
             });
@@ -332,17 +385,19 @@ RsoRouter.post('/edit', function(req, res) {
     }
 });
 
-RsoRouter.post('/checkStatus', function(req, res) {
+RsoRouter.post('/RSOCount', function(req, res) {
     let retCode = 200;
     let message = "";
 
-    const { rsoID } = req.body; 
+    const { rsoid } = req.body; 
 
-    if (!rsoID) {
+    if (!rsoid) {
         retCode = 400;
         message = "RSO ID is required.";
         return res.status(retCode).json({ message });
     }
+
+    console.log("Begin RSOCount for RSOID " + rsoid);
 
     try {
         pool.getConnection(function(err, con) {
@@ -354,7 +409,7 @@ RsoRouter.post('/checkStatus', function(req, res) {
 
             con.query({
                 sql: "SELECT COUNT(UID) AS memberCount FROM RSOMembers WHERE RSOID = ?",
-                values: [rsoID]
+                values: [rsoid]
             }, function(err, results) {
                 if (err) {
                     if (con)
@@ -371,7 +426,7 @@ RsoRouter.post('/checkStatus', function(req, res) {
                 const memberCount = results[0].memberCount;
                 const isActive = memberCount >= 5 ? true : false;
 
-                const ret = { rsoID, memberCount, isActive };
+                const ret = { memberCount, isActive, message };
                 res.status(retCode).json(ret);
             });
         });
